@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="fr" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EffortTracker Pro - Lycée</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Font Inter & FontAwesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js for graphs -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        input[type=range]::-webkit-slider-thumb {
+            pointer-events: all;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: #16a34a;
+            cursor: pointer;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+            transition: transform 0.1s ease;
+        }
+        input[type=range]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-full flex flex-col transition-colors duration-200">
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed top-5 right-5 z-50 transform translate-x-full transition-transform duration-300 bg-emerald-600 text-white px-6 py-3 rounded-2xl shadow-2xl flex items-center space-x-3">
+        <i class="fa-solid fa-circle-check text-xl"></i>
+        <span id="toast-message" class="font-medium">Action réussie !</span>
+    </div>
+
+    <!-- Navigation Header -->
+    <header class="bg-white/80 dark:bg-slate-800/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-700 sticky top-0 z-40 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="bg-emerald-600 text-white p-2.5 rounded-2xl shadow-md">
+                    <i class="fa-solid fa-graduation-cap text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="text-base sm:text-lg font-extrabold tracking-tight">EffortTracker Lycée</h1>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Suivi quotidien & Pondération</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center space-x-1 sm:space-x-2 overflow-x-auto py-2">
+                <button onclick="switchTab('dashboard')" id="nav-dashboard" class="px-3 py-2 text-xs sm:text-sm font-semibold rounded-xl transition-all bg-emerald-50 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 shrink-0">
+                    <i class="fa-solid fa-calendar-day mr-1.5"></i>Aujourd'hui
+                </button>
+                <button onclick="switchTab('history')" id="nav-history" class="px-3 py-2 text-xs sm:text-sm font-semibold rounded-xl transition-all text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 shrink-0">
+                    <i class="fa-solid fa-chart-line mr-1.5"></i>Stats & Heatmap
+                </button>
+                <button onclick="switchTab('goals')" id="nav-goals" class="px-3 py-2 text-xs sm:text-sm font-semibold rounded-xl transition-all text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 shrink-0">
+                    <i class="fa-solid fa-bullseye mr-1.5"></i>Objectifs
+                </button>
+                <button onclick="switchTab('categories')" id="nav-categories" class="px-3 py-2 text-xs sm:text-sm font-semibold rounded-xl transition-all text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 shrink-0">
+                    <i class="fa-solid fa-sliders mr-1.5"></i>Poids
+                </button>
+                <button onclick="switchTab('mobile-app')" id="nav-mobile-app" class="px-3 py-2 text-xs sm:text-sm font-semibold rounded-xl transition-all text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 shrink-0">
+                    <i class="fa-solid fa-mobile-screen-button mr-1.5 text-emerald-600"></i>App Mobile
+                </button>
+                <button onclick="toggleDarkMode()" class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition shrink-0" title="Basculer le thème">
+                    <i class="fa-solid fa-moon dark:hidden"></i>
+                    <i class="fa-solid fa-sun hidden dark:inline"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+
+        <!-- TAB 1 : DASHBOARD (Aujourd'hui) -->
+        <section id="tab-dashboard" class="space-y-8">
+            <!-- Top Summary Card with Mode Selector & Quote -->
+            <div class="bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-700 rounded-3xl p-6 sm:p-8 text-white shadow-xl flex flex-col lg:flex-row items-center justify-between gap-6">
+                <div class="space-y-3 text-center lg:text-left w-full lg:w-auto">
+                    <div class="flex flex-wrap items-center justify-center lg:justify-start gap-2">
+                        <span class="inline-flex items-center space-x-2 bg-white/20 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider backdrop-blur-sm">
+                            <i class="fa-regular fa-calendar"></i>
+                            <span id="current-date-label">Chargement...</span>
+                        </span>
+                        <!-- Mode selector (Cours / Weekend / Vacances) -->
+                        <select id="day-mode-select" onchange="changeDayMode(this.value)" class="bg-white/20 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-semibold focus:outline-none border border-white/30 cursor-pointer">
+                            <option value="cours" class="bg-slate-800 text-white">📚 Jour de Cours</option>
+                            <option value="weekend" class="bg-slate-800 text-white">🌴 Week-end</option>
+                            <option value="vacances" class="bg-slate-800 text-white">🏖️ Vacances</option>
+                        </select>
+                    </div>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold">Bilan Quotidien</h2>
+                    <!-- Dynamic motivational quote based on score -->
+                    <p id="daily-quote" class="text-emerald-100 text-sm max-w-xl italic">
+                        "Chaque petit effort compte pour construire ton avenir."
+                    </p>
+                </div>
+                
+                <div class="flex flex-col sm:flex-row gap-4 items-center">
+                    <!-- 7-day moving average badge -->
+                    <div class="bg-white/10 backdrop-blur-md border border-white/20 p-4 rounded-2xl flex flex-col items-center justify-center min-w-[140px] shadow-inner">
+                        <span class="text-[10px] uppercase tracking-wider font-semibold text-emerald-200">Moyenne Mobile 7j</span>
+                        <div class="flex items-baseline space-x-1 mt-1">
+                            <span id="moving-avg" class="text-2xl font-bold">--</span>
+                            <span class="text-sm font-medium text-emerald-200">/20</span>
+                        </div>
+                    </div>
+
+                    <!-- Global Score Card -->
+                    <div class="bg-white/15 backdrop-blur-md border border-white/25 p-6 rounded-2xl flex flex-col items-center justify-center min-w-[180px] shadow-inner">
+                        <span class="text-xs uppercase tracking-wider font-semibold text-emerald-100">Note Globale Pondérée</span>
+                        <div class="flex items-baseline space-x-1 mt-1">
+                            <span id="global-score" class="text-5xl font-black">--</span>
+                            <span class="text-xl font-medium text-emerald-200">/20</span>
+                        </div>
+                        <span id="global-status" class="mt-2 text-xs font-medium px-3 py-1 rounded-full bg-white/25 text-white">En attente...</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Interactive Form / Sliders & Journal -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Sliders Section (2 cols) -->
+                <div class="lg:col-span-2 space-y-6">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-lg font-bold flex items-center space-x-2">
+                            <i class="fa-solid fa-sliders text-emerald-600"></i>
+                            <span>Évaluation par Catégorie (Curseurs sur 20)</span>
+                        </h3>
+                        <span class="text-xs text-slate-500 dark:text-slate-400">Ajuste selon tes repères</span>
+                    </div>
+
+                    <div id="sliders-container" class="space-y-6">
+                        <!-- Dynamically injected by JavaScript -->
+                    </div>
+
+                    <!-- Quick Journal / Notes du jour -->
+                    <div class="bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-3">
+                        <label for="day-notes" class="block font-bold text-slate-800 dark:text-slate-100 flex items-center space-x-2">
+                            <i class="fa-solid fa-book-open text-amber-500"></i>
+                            <span>Journal rapide & Faits marquants du jour</span>
+                        </label>
+                        <textarea id="day-notes" rows="3" placeholder="Ex: Contrôle de maths réussi, grosse fatigue l'après-midi, super sortie avec les potes..." class="w-full px-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none"></textarea>
+                    </div>
+
+                    <div class="pt-2 flex flex-wrap items-center justify-between gap-4">
+                        <!-- Quick copy button for Discord / Notes -->
+                        <button onclick="copyDiscordSummary()" class="px-5 py-3 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-semibold rounded-2xl transition flex items-center space-x-2 text-sm">
+                            <i class="fa-solid fa-copy"></i>
+                            <span>Copier le résumé (Discord / Notes)</span>
+                        </button>
+
+                        <button onclick="saveTodayData()" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-2xl shadow-lg shadow-emerald-600/20 transition flex items-center space-x-2 text-sm">
+                            <i class="fa-solid fa-floppy-disk"></i>
+                            <span>Enregistrer la journée</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Side Panel: Stats summary & quick tips -->
+                <div class="space-y-6">
+                    <!-- Notification Reminder Panel -->
+                    <div class="bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-4">
+                        <div class="flex items-center justify-between">
+                            <h4 class="font-bold text-slate-800 dark:text-slate-100 flex items-center space-x-2">
+                                <i class="fa-solid fa-bell text-emerald-600"></i>
+                                <span>Rappel Quotidien (20h00)</span>
+                            </h4>
+                        </div>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Reçois une notification chaque soir à 20h pour ne jamais oublier de faire ton bilan.</p>
+                        <div id="notif-status-box" class="flex items-center justify-between pt-2">
+                            <span id="notif-label" class="text-xs font-semibold text-slate-600 dark:text-slate-300">Statut : Inactif</span>
+                            <button id="notif-btn" onclick="toggleNotifications()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-xl transition shadow">
+                                Activer 20h
+                            </button>
+                        </div>
+                        <button onclick="testNotification()" class="w-full mt-2 px-3 py-1.5 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-300 text-xs font-semibold rounded-xl transition">
+                            Tester une notification immédiate
+                        </button>
+                    </div>
+
+                    <div class="bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-4">
+                        <h4 class="font-bold text-slate-800 dark:text-slate-100 flex items-center space-x-2">
+                            <i class="fa-solid fa-fire text-orange-500"></i>
+                            <span>Régularité & Statistiques</span>
+                        </h4>
+                        <div class="flex items-center justify-between text-sm">
+                            <span class="text-slate-500 dark:text-slate-400">Jours enregistrés</span>
+                            <span id="stats-total-days" class="font-bold text-base">0</span>
+                        </div>
+                        <div class="flex items-center justify-between text-sm">
+                            <span class="text-slate-500 dark:text-slate-400">Moyenne générale</span>
+                            <span id="stats-global-avg" class="font-bold text-base text-emerald-600">-- / 20</span>
+                        </div>
+                    </div>
+
+                    <!-- Export / Import buttons container -->
+                    <div class="bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-4">
+                        <h4 class="font-bold text-slate-800 dark:text-slate-100 flex items-center space-x-2">
+                            <i class="fa-solid fa-database text-teal-600"></i>
+                            <span>Sauvegarde & Données</span>
+                        </h4>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Tes données sont stockées en local sur ton appareil. Pense à les exporter pour ne rien perdre.</p>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button onclick="exportJSON()" class="px-3 py-2 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-xs font-semibold rounded-xl transition flex items-center justify-center space-x-1.5">
+                                <i class="fa-solid fa-download"></i><span>JSON</span>
+                            </button>
+                            <button onclick="exportCSV()" class="px-3 py-2 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-xs font-semibold rounded-xl transition flex items-center justify-center space-x-1.5">
+                                <i class="fa-solid fa-file-csv"></i><span>CSV</span>
+                            </button>
+                        </div>
+                        <label class="w-full px-3 py-2 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-xs font-semibold rounded-xl transition flex items-center justify-center space-x-1.5 cursor-pointer">
+                            <i class="fa-solid fa-upload"></i><span>Importer un fichier</span>
+                            <input type="file" id="import-file" onchange="importData(event)" class="hidden" accept=".json">
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 2 : STATS & HEATMAP -->
+        <section id="tab-history" class="space-y-8 hidden">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                    <h2 class="text-2xl font-extrabold">Statistiques & Rétrospective</h2>
+                    <p class="text-sm text-slate-500 dark:text-slate-400">Visualise tes progrès sous forme de graphiques et de calendrier.</p>
+                </div>
+            </div>
+
+            <!-- Heatmap Calendar (30 days grid) -->
+            <div class="bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-4">
+                <h3 class="font-bold text-base flex items-center space-x-2">
+                    <i class="fa-solid fa-calendar-days text-emerald-600"></i>
+                    <span>Rétrospective des 30 derniers jours (Heatmap)</span>
+                </h3>
+                <p class="text-xs text-slate-500 dark:text-slate-400">Chaque case représente un jour. Plus la couleur est verte, meilleure a été ta journée !</p>
+                <div id="heatmap-container" class="grid grid-cols-6 sm:grid-cols-10 md:grid-cols-15 gap-2.5 pt-2">
+                    <!-- Injected by JS -->
+                </div>
+            </div>
+
+            <!-- Chart.js Progression Graph -->
+            <div class="bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-4">
+                <h3 class="font-bold text-base flex items-center space-x-2">
+                    <i class="fa-solid fa-chart-line text-emerald-600"></i>
+                    <span>Courbe d'Évolution de la Note Pondérée</span>
+                </h3>
+                <div class="h-80 relative">
+                    <canvas id="historyChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Past Days Log Table -->
+            <div class="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
+                <div class="p-6 border-b border-slate-200 dark:border-slate-700">
+                    <h3 class="font-bold text-base">Journal détaillé des entrées</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr class="bg-slate-50 dark:bg-slate-700/50 text-slate-500 dark:text-slate-400 font-semibold uppercase text-xs tracking-wider">
+                                <th class="p-4">Date</th>
+                                <th class="p-4">Note Pondérée</th>
+                                <th class="p-4">Notes & Faits marquants</th>
+                                <th class="p-4 text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="history-table-body" class="divide-y divide-slate-200 dark:divide-slate-700">
+                            <!-- Injected by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3 : OBJECTIFS -->
+        <section id="tab-goals" class="space-y-8 hidden">
+            <div>
+                <h2 class="text-2xl font-extrabold">Objectifs Hebdomadaires par Catégorie</h2>
+                <p class="text-sm text-slate-500 dark:text-slate-400">Définis un score moyen cible à atteindre chaque semaine pour rester motivé.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="goals-container">
+                <!-- Injected by JS -->
+            </div>
+        </section>
+
+        <!-- TAB 4 : CATEGORIES & WEIGHTS -->
+        <section id="tab-categories" class="space-y-8 hidden">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                    <h2 class="text-2xl font-extrabold">Gestion des Catégories & Poids</h2>
+                    <p class="text-sm text-slate-500 dark:text-slate-400">Vie Sociale (4x), Études (3x), Activités (2x), Sommeil (1x).</p>
+                </div>
+                <button onclick="openCategoryModal()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl shadow transition flex items-center space-x-2 text-sm">
+                    <i class="fa-solid fa-plus"></i>
+                    <span>Ajouter une catégorie</span>
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" id="categories-grid">
+                <!-- Injected by JS -->
+            </div>
+        </section>
+
+        <!-- TAB 5 : TRANSFORMER EN APP MOBILE -->
+        <section id="tab-mobile-app" class="space-y-8 hidden">
+            <div>
+                <h2 class="text-2xl font-extrabold flex items-center space-x-3">
+                    <i class="fa-solid fa-mobile-screen-button text-emerald-600"></i>
+                    <span>Transformer en application sur ton téléphone</span>
+                </h2>
+                <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                    Tu n'as pas besoin de télécharger une application sur l'App Store ou Google Play ! Tu peux installer ce site directement sur l'écran d'accueil de ton téléphone en quelques secondes pour l'utiliser comme une vraie app (en plein écran, sans barre d'URL).
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- iPhone / iOS Guide -->
+                <div class="bg-white dark:bg-slate-800 p-6 sm:p-8 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-6">
+                    <div class="flex items-center space-x-3">
+                        <div class="p-3 bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-white rounded-2xl text-xl font-bold">
+                            <i class="fa-brands fa-apple"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-lg">Sur iPhone / iPad (Safari)</h3>
+                            <p class="text-xs text-slate-500">iOS (Safari obligatoire)</p>
+                        </div>
+                    </div>
+                    
+                    <ol class="space-y-4 text-sm">
+                        <li class="flex items-start space-x-3">
+                            <span class="flex items-center justify-center w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 font-bold text-xs shrink-0 mt-0.5">1</span>
+                            <span>Ouvre cette page web dans le navigateur <strong>Safari</strong> de ton iPhone.</span>
+                        </li>
+                        <li class="flex items-start space-x-3">
+                            <span class="flex items-center justify-center w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 font-bold text-xs shrink-0 mt-0.5">2</span>
+                            <span>Appuie sur le bouton <strong>Partager</strong> en bas de l'écran (l'icône carrée avec une flèche vers le haut <i class="fa-solid fa-arrow-up-from-bracket inline text-blue-500"></i>).</span>
+                        </li>
+                        <li class="flex items-start space-x-3">
+                            <span class="flex items-center justify-center w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 font-bold text-xs shrink-0 mt-0.5">3</span>
+                            <span>Fais défiler les options et appuie sur <strong>« Sur l'écran d'accueil »</strong> <i class="fa-solid fa-square-plus inline"></i>.</span>
+                        </li>
+                        <li class="flex items-start space-x-3">
+                            <span class="flex items-center justify-center w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 font-bold text-xs shrink-0 mt-0.5">4</span>
+                            <span>Renomme l'application si tu veux (ex: <em>EffortTracker</em>) et appuie sur <strong>Ajouter</strong> en haut à droite. C'est fait ! L'icône apparaît sur ton écran d'accueil.</span>
+                        </li>
+                    </ol>
+                </div>
+
+                <!-- Android Guide -->
+                <div class="bg-white dark:bg-slate-800 p-6 sm:p-8 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-6">
+                    <div class="flex items-center space-x-3">
+                        <div class="p-3 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 rounded-2xl text-xl font-bold">
+                            <i class="fa-brands fa-android"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-lg">Sur Android (Chrome)</h3>
+                            <p class="text-xs text-slate-500">Smartphones Samsung, Xiaomi, Google Pixel...</p>
+                        </div>
+                    </div>
+                    
+                    <ol class="space-y-4 text-sm">
+                        <li class="flex items-start space-x-3">
+                            <span class="flex items-center justify-center w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 font-bold text-xs shrink-0 mt-0.5">1</span>
+                            <span>Ouvre cette page web dans le navigateur <strong>Google Chrome</strong> de ton téléphone.</span>
+                        </li>
+                        <li class="flex items-start space-x-3">
+                            <span class="flex items-center justify-center w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 font-bold text-xs shrink-0 mt-0.5">2</span>
+                            <span>Appuie sur le bouton des <strong>trois petits points verticaux</strong> en haut à droite de l'écran <i class="fa-solid fa-ellipsis-vertical inline"></i>.</span>
+                        </li>
+                        <li class="flex items-start space-x-3">
+                            <span class="flex items-center justify-center w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 font-bold text-xs shrink-0 mt-0.5">3</span>
+                            <span>Sélectionne l'option <strong>« Ajouter à l'écran d'accueil »</strong> ou <strong>« Installer l'application »</strong>.</span>
+                        </li>
+                        <li class="flex items-start space-x-3">
+                            <span class="flex items-center justify-center w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 font-bold text-xs shrink-0 mt-0.5">4</span>
+                            <span>Confirme en appuyant sur <strong>Ajouter</strong>. L'icône de l'app s'installe directement parmi tes applications !</span>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800/50 p-6 rounded-3xl flex items-start space-x-4">
+                <i class="fa-solid fa-lightbulb text-emerald-600 text-xl mt-1"></i>
+                <div class="space-y-1 text-sm text-emerald-900 dark:text-emerald-200">
+                    <h4 class="font-bold">Astuce importante</h4>
+                    <p>Comme tes données sont enregistrées dans la mémoire locale de ton navigateur, l'application fonctionnera parfaitement et tu pourras remplir ton bilan chaque soir, même hors-ligne ! Pense simplement à faire une sauvegarde (via le bouton JSON dans l'onglet Aujourd'hui) de temps en temps.</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Modal for Category Add/Edit -->
+    <div id="category-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-800 rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-6 border border-slate-200 dark:border-slate-700">
+            <div class="flex items-center justify-between">
+                <h3 id="modal-title" class="text-lg font-bold">Nouvelle Catégorie</h3>
+                <button onclick="closeCategoryModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+
+            <form id="category-form" onsubmit="handleCategorySubmit(event)" class="space-y-4">
+                <input type="hidden" id="cat-edit-id">
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">Nom de la catégorie</label>
+                    <input type="text" id="cat-name" required placeholder="Ex: Projet perso, Langues..." class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">Icône (FontAwesome)</label>
+                    <input type="text" id="cat-icon" required placeholder="Ex: fa-solid fa-book" class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">Poids / Importance (1 à 5)</label>
+                    <div class="flex items-center space-x-4">
+                        <input type="range" id="cat-weight" min="1" max="5" value="2" step="1" oninput="document.getElementById('weight-val').innerText = this.value" class="w-full accent-emerald-600 cursor-pointer">
+                        <span id="weight-val" class="font-bold text-lg text-emerald-600 w-8 text-center">2</span>
+                    </div>
+                </div>
+
+                <div class="flex justify-end space-x-3 pt-4">
+                    <button type="button" onclick="closeCategoryModal()" class="px-4 py-2 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-xl text-sm font-semibold transition">Annuler</button>
+                    <button type="submit" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-semibold shadow-lg shadow-emerald-600/20 transition">Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Application JavaScript Logic -->
+    <script>
+        const defaultCategories = [
+            { id: 'social', name: 'Vie Sociale & Proches', icon: 'fa-solid fa-users', weight: 4 },
+            { id: 'etudes', name: 'Études & Cours', icon: 'fa-solid fa-graduation-cap', weight: 3 },
+            { id: 'activites', name: 'Activités & Loisirs/Sport', icon: 'fa-solid fa-dumbbell', weight: 2 },
+            { id: 'sommeil', name: 'Sommeil & Bien-être', icon: 'fa-solid fa-bed', weight: 1 }
+        ];
+
+        function getCategoryBenchmark(catId, score, mode) {
+            if (catId === 'etudes') {
+                if (mode === 'vacances' || mode === 'weekend') {
+                    if (score <= 5) return "Aucune lecture ou révision (Repos total)";
+                    if (score <= 12) return "Légère lecture ou rangement de cours (~30 min)";
+                    return "Avancée sur les projets ou révisions anticipées (1h+)";
+                }
+                if (score <= 4) return "0 min de devoirs, inattention totale en cours";
+                if (score <= 8) return "30 min de devoirs vite faits, concentration en baisse";
+                if (score <= 13) return "1h à 1h30 de travail personnel / révisions sérieuses";
+                if (score <= 17) return "2h de révision efficace, fiches faites, participation active";
+                return "3h+ de travail personnel, exercices complexes maîtrisés";
+            } else if (catId === 'social') {
+                if (score <= 4) return "0 interaction sociale de qualité (isolement)";
+                if (score <= 8) return "Discussions rapides au lycée ou messages en ligne";
+                if (score <= 13) return "Temps de qualité partagé avec des proches ou discussions enrichissantes (~1h)";
+                if (score <= 17) return "Sortie entre amis, moments forts partagés et écoute active en famille";
+                return "Excellente connexion sociale, moments forts et entraide active";
+            } else if (catId === 'activites') {
+                if (score <= 4) return "Aucun loisir actif (uniquement scroll ou passivité)";
+                if (score <= 8) return "30 min de détente (jeux, série sans excès)";
+                if (score <= 13) return "45 min à 1h de sport, pratique artistique ou projet perso";
+                if (score <= 17) return "1h30 de sport ou de passion active (entraînement, création)";
+                return "2h+ d'activité physique ou passionnante et épanouissante";
+            } else if (catId === 'sommeil') {
+                if (score <= 4) return "Moins de 6h de sommeil, fatigue intense, stress élevé";
+                if (score <= 8) return "6h à 6h30 de sommeil, réveil difficile";
+                if (score <= 13) return "7h à 7h30 de sommeil, forme correcte";
+                if (score <= 17) return "8h de sommeil réparateur et moments de détente";
+                return "8h30+ de sommeil de qualité, super forme et zénitude totale";
+            }
+            if (score <= 4) return "Effort minime ou inexistant";
+            if (score <= 10) return "Effort modéré (~30 min)";
+            return "Engagement fort (~1h30+)";
+        }
+
+        let categories = JSON.parse(localStorage.getItem('effort_categories')) || defaultCategories;
+        let historyData = JSON.parse(localStorage.getItem('effort_history')) || [];
+        let goalsData = JSON.parse(localStorage.getItem('effort_goals')) || { social: 14, etudes: 14, activites: 12, sommeil: 14 };
+        let currentChart = null;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            initDate();
+            renderSliders();
+            updateGlobalScore();
+            updateStatsSummary();
+            initHistoryChart();
+            renderHistoryTable();
+            renderCategoriesGrid();
+            renderGoalsView();
+            renderHeatmap();
+            initNotificationsUI();
+            startNotificationChecker();
+
+            if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+            }
+        });
+
+        function initDate() {
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const todayStr = new Date().toLocaleDateString('fr-FR', options);
+            document.getElementById('current-date-label').innerText = todayStr.charAt(0).toUpperCase() + todayStr.slice(1);
+        }
+
+        function switchTab(tabId) {
+            ['dashboard', 'history', 'goals', 'categories', 'mobile-app'].forEach(id => {
+                document.getElementById(`tab-${id}`).classList.add('hidden');
+                document.getElementById(`nav-${id}`).className = "px-3 py-2 text-xs sm:text-sm font-semibold rounded-xl transition-all text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 shrink-0";
+            });
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+            document.getElementById(`nav-${tabId}`).className = "px-3 py-2 text-xs sm:text-sm font-semibold rounded-xl transition-all bg-emerald-50 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 shrink-0";
+            
+            if (tabId === 'history') {
+                renderHistoryTable();
+                renderHeatmap();
+                if (currentChart) currentChart.update();
+            } else if (tabId === 'goals') {
+                renderGoalsView();
+            } else if (tabId === 'categories') {
+                renderCategoriesGrid();
+            }
+        }
+
+        function toggleDarkMode() {
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        function changeDayMode(mode) {
+            renderSliders();
+            updateGlobalScore();
+        }
+
+        // Notification Management System
+        function initNotificationsUI() {
+            const enabled = localStorage.getItem('effort_notif_20h') === 'true';
+            const btn = document.getElementById('notif-btn');
+            const label = document.getElementById('notif-label');
+            if (enabled) {
+                label.innerText = "Statut : Actif (20h00)";
+                btn.innerText = "Désactiver";
+                btn.className = "px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold rounded-xl transition shadow";
+            } else {
+                label.innerText = "Statut : Inactif";
+                btn.innerText = "Activer 20h";
+                btn.className = "px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-xl transition shadow";
+            }
+        }
+
+        async function toggleNotifications() {
+            const enabled = localStorage.getItem('effort_notif_20h') === 'true';
+            if (!enabled) {
+                if (!("Notification" in window)) {
+                    alert("Ton navigateur ne supporte pas les notifications.");
+                    return;
+                }
+                const permission = await Notification.requestPermission();
+                if (permission === "granted") {
+                    localStorage.setItem('effort_notif_20h', 'true');
+                    showToast("Rappel de 20h activé avec succès !");
+                } else {
+                    alert("Permission de notification refusée dans le navigateur.");
+                    return;
+                }
+            } else {
+                localStorage.setItem('effort_notif_20h', 'false');
+                showToast("Rappel de 20h désactivé.");
+            }
+            initNotificationsUI();
+        }
+
+        function testNotification() {
+            if (!("Notification" in window)) {
+                alert("Ton navigateur ne supporte pas les notifications.");
+                return;
+            }
+            Notification.requestPermission().then(permission => {
+                if (permission === "granted") {
+                    new Notification("EffortTracker Lycée 🎯", {
+                        body: "C'est l'heure de faire ton bilan quotidien de la journée !",
+                        icon: "https://placehold.co/192x192/16a34a/ffffff?text=ET"
+                    });
+                    showToast("Notification de test envoyée !");
+                } else {
+                    alert("Veuillez autoriser les notifications dans votre navigateur.");
+                }
+            });
+        }
+
+        function startNotificationChecker() {
+            setInterval(() => {
+                const enabled = localStorage.getItem('effort_notif_20h') === 'true';
+                if (!enabled) return;
+
+                const now = new Date();
+                const hours = now.getHours();
+                const minutes = now.getMinutes();
+                const todayKey = now.toISOString().split('T')[0];
+                const lastNotifDate = localStorage.getItem('effort_last_notif_date');
+
+                if (hours === 20 && minutes === 0 && lastNotifDate !== todayKey) {
+                    if ("Notification" in window && Notification.permission === "granted") {
+                        new Notification("Bilan du soir 🌙 - EffortTracker", {
+                            body: "Il est 20h ! Pense à noter ta journée (études, vie sociale, sommeil...) pour garder le cap.",
+                            icon: "https://placehold.co/192x192/16a34a/ffffff?text=ET"
+                        });
+                        localStorage.setItem('effort_last_notif_date', todayKey);
+                    }
+                }
+            }, 60000);
+        }
+
+        function renderSliders() {
+            const container = document.getElementById('sliders-container');
+            container.innerHTML = '';
+
+            const todayKey = new Date().toISOString().split('T')[0];
+            const existingEntry = historyData.find(d => d.date === todayKey);
+            const mode = document.getElementById('day-mode-select').value;
+
+            categories.forEach(cat => {
+                const initialVal = existingEntry && existingEntry.scores[cat.id] !== undefined ? existingEntry.scores[cat.id] : 12;
+                const benchmarkText = getCategoryBenchmark(cat.id, initialVal, mode);
+
+                const card = document.createElement('div');
+                card.className = "bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-4";
+                card.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <div class="p-2.5 rounded-2xl bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400">
+                                <i class="${cat.icon} text-lg"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-slate-800 dark:text-slate-100">${cat.name}</h4>
+                                <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">Poids : ${cat.weight}x</span>
+                            </div>
+                        </div>
+                        <div class="flex items-baseline space-x-1">
+                            <span id="score-val-${cat.id}" class="text-2xl font-black text-emerald-600 dark:text-emerald-400">${initialVal}</span>
+                            <span class="text-xs font-medium text-slate-400">/20</span>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <input type="range" id="slider-${cat.id}" min="0" max="20" step="1" value="${initialVal}" 
+                            oninput="onSliderChange('${cat.id}', this.value)" 
+                            class="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-emerald-600">
+                    </div>
+
+                    <div class="flex items-start space-x-2 p-3 rounded-2xl bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800 text-xs">
+                        <i class="fa-solid fa-circle-info text-emerald-600 mt-0.5 shrink-0"></i>
+                        <span id="benchmark-${cat.id}" class="text-slate-600 dark:text-slate-300 font-medium">${benchmarkText}</span>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+
+            if (existingEntry && existingEntry.notes) {
+                document.getElementById('day-notes').value = existingEntry.notes;
+            }
+        }
+
+        function onSliderChange(catId, value) {
+            const valNum = parseInt(value, 10);
+            const mode = document.getElementById('day-mode-select').value;
+            document.getElementById(`score-val-${catId}`).innerText = valNum;
+            document.getElementById(`benchmark-${catId}`).innerText = getCategoryBenchmark(catId, valNum, mode);
+            updateGlobalScore();
+        }
+
+        function calculateWeightedScore(scoresObj) {
+            let totalWeightedScore = 0;
+            let totalWeights = 0;
+
+            categories.forEach(cat => {
+                const score = scoresObj[cat.id] !== undefined ? scoresObj[cat.id] : 12;
+                totalWeightedScore += score * cat.weight;
+                totalWeights += cat.weight;
+            });
+
+            if (totalWeights === 0) return 0;
+            return (totalWeightedScore / totalWeights).toFixed(1);
+        }
+
+        function updateGlobalScore() {
+            let currentScores = {};
+            categories.forEach(cat => {
+                const slider = document.getElementById(`slider-${cat.id}`);
+                currentScores[cat.id] = slider ? parseInt(slider.value, 10) : 12;
+            });
+
+            const global = parseFloat(calculateWeightedScore(currentScores));
+            document.getElementById('global-score').innerText = global;
+
+            const statusEl = document.getElementById('global-status');
+            const quoteEl = document.getElementById('daily-quote');
+
+            if (global < 8) {
+                statusEl.innerText = "Journée difficile";
+                statusEl.className = "mt-2 text-xs font-semibold px-3 py-1 rounded-full bg-rose-500/30 text-rose-100";
+                quoteEl.innerText = `"Demain est un nouveau jour pour tout donner. Ne lâche rien !"`;
+            } else if (global < 12) {
+                statusEl.innerText = "Effort modéré";
+                statusEl.className = "mt-2 text-xs font-semibold px-3 py-1 rounded-full bg-amber-500/30 text-amber-100";
+                quoteEl.innerText = `"Tu assures l'essentiel, essaie d'appuyer un peu plus sur tes priorités demain."`;
+            } else if (global < 16) {
+                statusEl.innerText = "Bonne journée !";
+                statusEl.className = "mt-2 text-xs font-semibold px-3 py-1 rounded-full bg-teal-500/30 text-teal-100";
+                quoteEl.innerText = `"Belle régularité ! Ton équilibre vie sociale et études porte ses fruits."`;
+            } else {
+                statusEl.innerText = "Journée exceptionnelle 🚀";
+                statusEl.className = "mt-2 text-xs font-semibold px-3 py-1 rounded-full bg-white/30 text-white";
+                quoteEl.innerText = `"Performance au sommet ! Tu gères ta vie de lycéen d'une main de maître."`;
+            }
+        }
+
+        function saveTodayData() {
+            const todayKey = new Date().toISOString().split('T')[0];
+            let currentScores = {};
+            categories.forEach(cat => {
+                const slider = document.getElementById(`slider-${cat.id}`);
+                currentScores[cat.id] = slider ? parseInt(slider.value, 10) : 12;
+            });
+
+            const global = parseFloat(calculateWeightedScore(currentScores));
+            const notes = document.getElementById('day-notes').value;
+            const mode = document.getElementById('day-mode-select').value;
+
+            const existingIndex = historyData.findIndex(d => d.date === todayKey);
+            if (existingIndex >= 0) {
+                historyData[existingIndex].scores = currentScores;
+                historyData[existingIndex].global = global;
+                historyData[existingIndex].notes = notes;
+                historyData[existingIndex].mode = mode;
+            } else {
+                historyData.push({
+                    date: todayKey,
+                    scores: currentScores,
+                    global: global,
+                    notes: notes,
+                    mode: mode
+                });
+            }
+
+            historyData.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            localStorage.setItem('effort_history', JSON.stringify(historyData));
+            updateStatsSummary();
+            renderHistoryTable();
+            renderHeatmap();
+            if (currentChart) initHistoryChart();
+
+            showToast("Bilan de la journée enregistré avec succès !");
+        }
+
+        function copyDiscordSummary() {
+            const todayKey = new Date().toISOString().split('T')[0];
+            let currentScores = {};
+            categories.forEach(cat => {
+                const slider = document.getElementById(`slider-${cat.id}`);
+                currentScores[cat.id] = slider ? parseInt(slider.value, 10) : 12;
+            });
+            const global = calculateWeightedScore(currentScores);
+            const notes = document.getElementById('day-notes').value || "Aucune note particulière.";
+
+            let text = `📊 **Bilan EffortTracker - ${todayKey}**\n`;
+            text += `⭐ **Note Globale Pondérée : ${global}/20**\n`;
+            categories.forEach(cat => {
+                text += `• ${cat.name} (${cat.weight}x) : ${currentScores[cat.id]}/20\n`;
+            });
+            text += `📝 *Notes :* ${notes}`;
+
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+
+            showToast("Résumé copié dans le presse-papier !");
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-message').innerText = msg;
+            toast.classList.remove('translate-x-full');
+            setTimeout(() => {
+                toast.classList.add('translate-x-full');
+            }, 3000);
+        }
+
+        function updateStatsSummary() {
+            document.getElementById('stats-total-days').innerText = historyData.length;
+            if (historyData.length === 0) {
+                document.getElementById('stats-global-avg').innerText = "-- / 20";
+                document.getElementById('moving-avg').innerText = "--";
+                return;
+            }
+            const sum = historyData.reduce((acc, curr) => acc + curr.global, 0);
+            const avg = (sum / historyData.length).toFixed(1);
+            document.getElementById('stats-global-avg').innerText = `${avg} / 20`;
+
+            const last7 = [...historyData].sort((a, b) => new Date(a.date) - new Date(b.date)).slice(-7);
+            const sum7 = last7.reduce((acc, curr) => acc + curr.global, 0);
+            const movingAvg = last7.length > 0 ? (sum7 / last7.length).toFixed(1) : "--";
+            document.getElementById('moving-avg').innerText = movingAvg;
+        }
+
+        function renderHeatmap() {
+            const container = document.getElementById('heatmap-container');
+            container.innerHTML = '';
+
+            for (let i = 29; i >= 0; i--) {
+                const d = new Date();
+                d.setDate(d.getDate() - i);
+                const dateKey = d.toISOString().split('T')[0];
+                const entry = historyData.find(item => item.date === dateKey);
+
+                let bgClass = 'bg-slate-200 dark:bg-slate-700 text-slate-400';
+                let scoreText = '-';
+
+                if (entry) {
+                    scoreText = entry.global;
+                    if (entry.global >= 16) bgClass = 'bg-emerald-600 text-white font-bold';
+                    else if (entry.global >= 13) bgClass = 'bg-teal-500 text-white font-bold';
+                    else if (entry.global >= 9) bgClass = 'bg-amber-500 text-white font-bold';
+                    else bgClass = 'bg-rose-500 text-white font-bold';
+                }
+
+                const dayLabel = d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+
+                const box = document.createElement('div');
+                box.className = `${bgClass} rounded-2xl p-3 flex flex-col items-center justify-center text-xs shadow-sm transition hover:scale-105 cursor-pointer`;
+                box.title = `${dayLabel} : ${scoreText}/20`;
+                box.innerHTML = `
+                    <span class="text-[10px] opacity-80">${d.getDate()}</span>
+                    <span class="text-xs font-bold mt-1">${scoreText}</span>
+                `;
+                container.appendChild(box);
+            }
+        }
+
+        function renderHistoryTable() {
+            const tbody = document.getElementById('history-table-body');
+            tbody.innerHTML = '';
+
+            if (historyData.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-slate-400">Aucun historique enregistré pour le moment.</td></tr>`;
+                return;
+            }
+
+            historyData.forEach((entry, index) => {
+                const dateFormatted = new Date(entry.date).toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+                let detailsHtml = `<div class="text-xs text-slate-600 dark:text-slate-300 italic">${entry.notes ? entry.notes : 'Pas de note enregistrée.'}</div>`;
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 dark:hover:bg-slate-700/30 transition";
+                tr.innerHTML = `
+                    <td class="p-4 font-medium capitalize">${dateFormatted}</td>
+                    <td class="p-4"><span class="px-3 py-1 rounded-full font-bold text-sm bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300">${entry.global} / 20</span></td>
+                    <td class="p-4">${detailsHtml}</td>
+                    <td class="p-4 text-right">
+                        <button onclick="deleteHistoryEntry(${index})" class="p-2 text-slate-400 hover:text-rose-500 transition" title="Supprimer">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function deleteHistoryEntry(index) {
+            if (confirm("Voulez-vous vraiment supprimer cette entrée ?")) {
+                historyData.splice(index, 1);
+                localStorage.setItem('effort_history', JSON.stringify(historyData));
+                renderHistoryTable();
+                updateStatsSummary();
+                renderHeatmap();
+                if (currentChart) initHistoryChart();
+                showToast("Entrée supprimée");
+            }
+        }
+
+        function initHistoryChart() {
+            const ctx = document.getElementById('historyChart').getContext('2d');
+            const sortedAsc = [...historyData].sort((a, b) => new Date(a.date) - new Date(b.date)).slice(-14);
+
+            const labels = sortedAsc.map(d => new Date(d.date).toLocaleDateString('fr-FR', { month: 'short', day: 'numeric' }));
+            const dataPoints = sortedAsc.map(d => d.global);
+
+            if (currentChart) currentChart.destroy();
+
+            const isDark = document.documentElement.classList.contains('dark');
+
+            currentChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Note Pondérée (/20)',
+                        data: dataPoints,
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.3,
+                        pointBackgroundColor: '#10b981',
+                        pointRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: {
+                            min: 0,
+                            max: 20,
+                            grid: { color: isDark ? '#334155' : '#f1f5f9' },
+                            ticks: { color: isDark ? '#94a3b8' : '#64748b' }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: isDark ? '#94a3b8' : '#64748b' }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderGoalsView() {
+            const container = document.getElementById('goals-container');
+            container.innerHTML = '';
+
+            categories.forEach(cat => {
+                const target = goalsData[cat.id] || 14;
+                const card = document.createElement('div');
+                card.className = "bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-4";
+                card.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <div class="p-3 rounded-2xl bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400">
+                                <i class="${cat.icon} text-xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-base text-slate-800 dark:text-slate-100">${cat.name}</h4>
+                                <span class="text-xs font-semibold text-emerald-600">Poids : ${cat.weight}x</span>
+                            </div>
+                        </div>
+                        <div class="flex items-baseline space-x-1">
+                            <span class="text-2xl font-black text-emerald-600">${target}</span>
+                            <span class="text-xs font-medium text-slate-400">/20 cible</span>
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400">Modifier l'objectif</label>
+                        <input type="range" min="5" max="20" step="1" value="${target}" onchange="updateGoal('${cat.id}', this.value)" class="w-full accent-emerald-600 cursor-pointer">
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function updateGoal(catId, val) {
+            goalsData[catId] = parseInt(val, 10);
+            localStorage.setItem('effort_goals', JSON.stringify(goalsData));
+            renderGoalsView();
+            showToast("Objectif mis à jour !");
+        }
+
+        function renderCategoriesGrid() {
+            const grid = document.getElementById('categories-grid');
+            grid.innerHTML = '';
+
+            categories.forEach(cat => {
+                const card = document.createElement('div');
+                card.className = "bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col justify-between space-y-4";
+                card.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <div class="p-3 rounded-2xl bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400">
+                                <i class="${cat.icon} text-xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-base text-slate-800 dark:text-slate-100">${cat.name}</h4>
+                                <span class="text-xs font-semibold text-emerald-600 dark:text-emerald-400">Poids : ${cat.weight}x</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-700">
+                        <button onclick="openCategoryModal('${cat.id}')" class="text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-emerald-600 transition flex items-center space-x-1">
+                            <i class="fa-solid fa-pen"></i><span>Modifier</span>
+                        </button>
+                        ${categories.length > 2 ? `<button onclick="deleteCategory('${cat.id}')" class="text-xs font-semibold text-rose-500 hover:text-rose-600 transition flex items-center space-x-1"><i class="fa-solid fa-trash"></i><span>Supprimer</span></button>` : ''}
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function openCategoryModal(catId = null) {
+            const modal = document.getElementById('category-modal');
+            modal.classList.remove('hidden');
+            if (catId) {
+                const cat = categories.find(c => c.id === catId);
+                document.getElementById('modal-title').innerText = "Modifier la catégorie";
+                document.getElementById('cat-edit-id').value = cat.id;
+                document.getElementById('cat-name').value = cat.name;
+                document.getElementById('cat-icon').value = cat.icon;
+                document.getElementById('cat-weight').value = cat.weight;
+                document.getElementById('weight-val').innerText = cat.weight;
+            } else {
+                document.getElementById('modal-title').innerText = "Nouvelle Catégorie";
+                document.getElementById('cat-edit-id').value = '';
+                document.getElementById('cat-name').value = '';
+                document.getElementById('cat-icon').value = 'fa-solid fa-star';
+                document.getElementById('cat-weight').value = 2;
+                document.getElementById('weight-val').innerText = '2';
+            }
+        }
+
+        function closeCategoryModal() {
+            document.getElementById('category-modal').classList.add('hidden');
+        }
+
+        function handleCategorySubmit(e) {
+            e.preventDefault();
+            const editId = document.getElementById('cat-edit-id').value;
+            const name = document.getElementById('cat-name').value;
+            const icon = document.getElementById('cat-icon').value;
+            const weight = parseInt(document.getElementById('cat-weight').value, 10);
+
+            if (editId) {
+                const cat = categories.find(c => c.id === editId);
+                if (cat) {
+                    cat.name = name;
+                    cat.icon = icon;
+                    cat.weight = weight;
+                }
+            } else {
+                const newId = name.toLowerCase().replace(/[^a-z0-9]/g, '_');
+                if (categories.some(c => c.id === newId)) {
+                    alert("Une catégorie avec ce nom existe déjà.");
+                    return;
+                }
+                categories.push({ id: newId, name, icon, weight });
+                goalsData[newId] = 14;
+            }
+
+            localStorage.setItem('effort_categories', JSON.stringify(categories));
+            localStorage.setItem('effort_goals', JSON.stringify(goalsData));
+            closeCategoryModal();
+            renderCategoriesGrid();
+            renderSliders();
+            renderGoalsView();
+            updateGlobalScore();
+            showToast("Catégories mises à jour !");
+        }
+
+        function deleteCategory(catId) {
+            if (categories.length <= 2) {
+                alert("Vous devez conserver au moins 2 catégories.");
+                return;
+            }
+            if (confirm("Voulez-vous supprimer cette catégorie ?")) {
+                categories = categories.filter(c => c.id !== catId);
+                localStorage.setItem('effort_categories', JSON.stringify(categories));
+                renderCategoriesGrid();
+                renderSliders();
+                renderGoalsView();
+                updateGlobalScore();
+                showToast("Catégorie supprimée");
+            }
+        }
+
+        function exportJSON() {
+            const data = { categories, history: historyData, goals: goalsData };
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `effort_tracker_lycee_${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+        }
+
+        function exportCSV() {
+            let csvContent = "data:text/csv;charset=utf-8,Date;NoteGlobale;Notes\n";
+            historyData.forEach(row => {
+                csvContent += `${row.date};${row.global};"${(row.notes || '').replace(/"/g, '""')}"\n`;
+            });
+            const encodedUri = encodeURI(csvContent);
+            const a = document.createElement('a');
+            a.href = encodedUri;
+            a.download = `effort_tracker_lycee_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const parsed = JSON.parse(e.target.result);
+                    if (parsed.categories && parsed.history) {
+                        categories = parsed.categories;
+                        historyData = parsed.history;
+                        if (parsed.goals) goalsData = parsed.goals;
+                        localStorage.setItem('effort_categories', JSON.stringify(categories));
+                        localStorage.setItem('effort_history', JSON.stringify(historyData));
+                        localStorage.setItem('effort_goals', JSON.stringify(goalsData));
+                        renderSliders();
+                        renderHistoryTable();
+                        renderCategoriesGrid();
+                        renderGoalsView();
+                        renderHeatmap();
+                        updateStatsSummary();
+                        if (currentChart) initHistoryChart();
+                        showToast("Données importées avec succès !");
+                    } else {
+                        alert("Format de fichier invalide.");
+                    }
+                } catch(err) {
+                    alert("Erreur lors de la lecture du fichier JSON.");
+                }
+            };
+            reader.readAsText(file);
+        }
+    </script>
+</body>
+</html>
