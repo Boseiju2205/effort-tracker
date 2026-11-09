@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EffortTracker Pro - Lycée</title>
+    <!-- PWA & Mobile Icons -->
+    <link rel="apple-touch-icon" href="https://placehold.co/192x192/16a34a/ffffff?text=ET">
+    <link rel="icon" type="image/png" href="https://placehold.co/192x192/16a34a/ffffff?text=ET">
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -55,35 +58,43 @@
     </div>
 
     <!-- Navigation Header -->
-    <header class="bg-white/80 dark:bg-slate-800/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-700 sticky top-0 z-40 shadow-sm">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-                <div class="bg-emerald-600 text-white p-2.5 rounded-2xl shadow-md">
-                    <i class="fa-solid fa-graduation-cap text-lg"></i>
+    <header class="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-700 sticky top-0 z-40 shadow-sm">
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2">
+            <div class="flex items-center space-x-2 shrink-0">
+                <div class="bg-emerald-600 text-white p-2 rounded-xl shadow-md">
+                    <i class="fa-solid fa-graduation-cap text-base"></i>
                 </div>
-                <div>
-                    <h1 class="text-base sm:text-lg font-extrabold tracking-tight">EffortTracker Lycée</h1>
-                    <p class="text-xs text-slate-500 dark:text-slate-400">Suivi quotidien & Pondération</p>
+                <div class="hidden sm:block">
+                    <h1 class="text-sm font-extrabold tracking-tight">EffortTracker</h1>
+                    <p class="text-[10px] text-slate-500 dark:text-slate-400">Cloud & Lycée</p>
                 </div>
             </div>
             
-            <div class="flex items-center space-x-1 sm:space-x-2 overflow-x-auto py-2">
-                <button onclick="switchTab('dashboard')" id="nav-dashboard" class="px-3 py-2 text-xs sm:text-sm font-semibold rounded-xl transition-all bg-emerald-50 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 shrink-0">
-                    <i class="fa-solid fa-calendar-day mr-1.5"></i>Aujourd'hui
+            <!-- Navigation Tabs (Optimized for horizontal scroll & touch on mobile) -->
+            <div class="flex items-center space-x-1 overflow-x-auto py-2 no-scrollbar max-w-[calc(100vw-120px)] sm:max-w-none">
+                <button onclick="switchTab('dashboard')" id="nav-dashboard" class="px-3 py-1.5 text-xs font-semibold rounded-xl transition-all bg-emerald-50 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 shrink-0 flex items-center space-x-1">
+                    <i class="fa-solid fa-calendar-day"></i><span>Aujourd'hui</span>
                 </button>
-                <button onclick="switchTab('history')" id="nav-history" class="px-3 py-2 text-xs sm:text-sm font-semibold rounded-xl transition-all text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 shrink-0">
-                    <i class="fa-solid fa-chart-line mr-1.5"></i>Stats & Heatmap
+                <button onclick="switchTab('history')" id="nav-history" class="px-3 py-1.5 text-xs font-semibold rounded-xl transition-all text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 shrink-0 flex items-center space-x-1">
+                    <i class="fa-solid fa-chart-line"></i><span>Stats</span>
                 </button>
-                <button onclick="switchTab('goals')" id="nav-goals" class="px-3 py-2 text-xs sm:text-sm font-semibold rounded-xl transition-all text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 shrink-0">
-                    <i class="fa-solid fa-bullseye mr-1.5"></i>Objectifs
+                <button onclick="switchTab('goals')" id="nav-goals" class="px-3 py-1.5 text-xs font-semibold rounded-xl transition-all text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 shrink-0 flex items-center space-x-1">
+                    <i class="fa-solid fa-bullseye"></i><span>Objectifs</span>
                 </button>
-                <button onclick="switchTab('categories')" id="nav-categories" class="px-3 py-2 text-xs sm:text-sm font-semibold rounded-xl transition-all text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 shrink-0">
-                    <i class="fa-solid fa-sliders mr-1.5"></i>Poids
+                <button onclick="switchTab('categories')" id="nav-categories" class="px-3 py-1.5 text-xs font-semibold rounded-xl transition-all text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 shrink-0 flex items-center space-x-1">
+                    <i class="fa-solid fa-sliders"></i><span>Poids</span>
                 </button>
-                <button onclick="switchTab('mobile-app')" id="nav-mobile-app" class="px-3 py-2 text-xs sm:text-sm font-semibold rounded-xl transition-all text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 shrink-0">
-                    <i class="fa-solid fa-mobile-screen-button mr-1.5 text-emerald-600"></i>App Mobile
+                <button onclick="switchTab('mobile-app')" id="nav-mobile-app" class="px-3 py-1.5 text-xs font-semibold rounded-xl transition-all text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 shrink-0 flex items-center space-x-1">
+                    <i class="fa-solid fa-mobile-screen-button text-emerald-600"></i><span>App</span>
                 </button>
-                <button onclick="toggleDarkMode()" class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition shrink-0" title="Basculer le thème">
+                <button onclick="switchTab('cloud-sync')" id="nav-cloud-sync" class="px-3 py-1.5 text-xs font-semibold rounded-xl transition-all text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 shrink-0 flex items-center space-x-1">
+                    <i class="fa-solid fa-cloud text-teal-600"></i><span>Compte</span>
+                </button>
+            </div>
+
+            <!-- Theme Toggle -->
+            <div class="shrink-0">
+                <button onclick="toggleDarkMode()" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 transition" title="Basculer le thème">
                     <i class="fa-solid fa-moon dark:hidden"></i>
                     <i class="fa-solid fa-sun hidden dark:inline"></i>
                 </button>
@@ -186,14 +197,21 @@
                         <div class="flex items-center justify-between">
                             <h4 class="font-bold text-slate-800 dark:text-slate-100 flex items-center space-x-2">
                                 <i class="fa-solid fa-bell text-emerald-600"></i>
-                                <span>Rappel Quotidien (20h00)</span>
+                                <span>Rappel Quotidien</span>
                             </h4>
                         </div>
-                        <p class="text-xs text-slate-500 dark:text-slate-400">Reçois une notification chaque soir à 20h pour ne jamais oublier de faire ton bilan.</p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Reçois une notification chaque jour à l'heure choisie pour ne jamais oublier de faire ton bilan.</p>
+                        
+                        <!-- Time picker for notification -->
+                        <div class="flex items-center justify-between pt-1">
+                            <label for="notif-time-input" class="text-xs font-semibold text-slate-700 dark:text-slate-300">Heure du rappel :</label>
+                            <input type="time" id="notif-time-input" value="20:00" onchange="updateNotifTime(this.value)" class="px-3 py-1.5 bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-bold rounded-xl border border-slate-200 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                        </div>
+
                         <div id="notif-status-box" class="flex items-center justify-between pt-2">
                             <span id="notif-label" class="text-xs font-semibold text-slate-600 dark:text-slate-300">Statut : Inactif</span>
                             <button id="notif-btn" onclick="toggleNotifications()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-xl transition shadow">
-                                Activer 20h
+                                Activer le rappel
                             </button>
                         </div>
                         <button onclick="testNotification()" class="w-full mt-2 px-3 py-1.5 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-300 text-xs font-semibold rounded-xl transition">
@@ -412,6 +430,88 @@
             </div>
         </section>
 
+        <!-- TAB 6 : CLOUD SYNC & COMPTE -->
+        <section id="tab-cloud-sync" class="space-y-8 hidden">
+            <div>
+                <h2 class="text-2xl font-extrabold flex items-center space-x-3">
+                    <i class="fa-solid fa-cloud text-teal-600"></i>
+                    <span>Synchronisation Cloud & Compte Multi-Appareil</span>
+                </h2>
+                <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                    Connecte-toi ou crée un compte pour sauvegarder ton historique sur le cloud et y accéder depuis ton téléphone, ta tablette ou ton ordinateur.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Account Status Card -->
+                <div class="bg-white dark:bg-slate-800 p-6 sm:p-8 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-6">
+                    <div class="flex items-center space-x-3">
+                        <div class="p-3 bg-teal-100 dark:bg-teal-900/30 text-teal-600 rounded-2xl text-xl font-bold">
+                            <i class="fa-solid fa-user-shield"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-lg">Statut du Compte</h3>
+                            <p id="account-status-subtitle" class="text-xs text-slate-500">Non connecté (Mode Local)</p>
+                        </div>
+                    </div>
+
+                    <div id="account-logged-out" class="space-y-4">
+                        <p class="text-sm text-slate-600 dark:text-slate-300">
+                            En créant un compte instantané, tes données seront automatiquement synchronisées et sécurisées dans le cloud.
+                        </p>
+                        <button onclick="loginAnonymouslyCloud()" class="w-full px-6 py-3 bg-teal-600 hover:bg-teal-700 text-white font-semibold rounded-2xl shadow-lg transition flex items-center justify-center space-x-2 text-sm">
+                            <i class="fa-solid fa-bolt"></i>
+                            <span>Créer mon compte / Se connecter</span>
+                        </button>
+                    </div>
+
+                    <div id="account-logged-in" class="space-y-4 hidden">
+                        <div class="p-4 bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-2">
+                            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider block">ID Utilisateur Unique</span>
+                            <code id="user-uid-display" class="text-xs font-mono text-teal-600 dark:text-teal-400 break-all block">--</code>
+                        </div>
+                        <p class="text-xs text-slate-500">
+                            💡 Conserve cet ID ou connecte-toi sur un autre appareil pour retrouver instantanément ton historique.
+                        </p>
+                        <button onclick="syncNowToCloud()" class="w-full px-5 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-2xl transition flex items-center justify-center space-x-2 text-sm">
+                            <i class="fa-solid fa-rotate"></i>
+                            <span>Forcer la synchronisation Cloud</span>
+                        </button>
+                        <button onclick="logoutCloud()" class="w-full px-4 py-2 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 font-semibold rounded-xl text-xs transition">
+                            Déconnexion
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Info Card -->
+                <div class="bg-white dark:bg-slate-800 p-6 sm:p-8 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-6">
+                    <div class="flex items-center space-x-3">
+                        <div class="p-3 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 rounded-2xl text-xl font-bold">
+                            <i class="fa-solid fa-shield-halved"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-lg">Sécurité & Confidentialité</h3>
+                            <p class="text-xs text-slate-500">100% Sécurisé</p>
+                        </div>
+                    </div>
+                    <ul class="space-y-3 text-sm text-slate-600 dark:text-slate-300">
+                        <li class="flex items-start space-x-2">
+                            <i class="fa-solid fa-check text-emerald-600 mt-1"></i>
+                            <span>Tes notes personnelles et ton journal restent strictement privés.</span>
+                        </li>
+                        <li class="flex items-start space-x-2">
+                            <i class="fa-solid fa-check text-emerald-600 mt-1"></i>
+                            <span>Aucun mot de passe compliqué à retenir : authentification instantanée.</span>
+                        </li>
+                        <li class="flex items-start space-x-2">
+                            <i class="fa-solid fa-check text-emerald-600 mt-1"></i>
+                            <span>Fonctionne en tandem avec le stockage local pour zéro perte de données.</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
     </main>
 
     <!-- Modal for Category Add/Edit -->
@@ -463,34 +563,78 @@
 
         function getCategoryBenchmark(catId, score, mode) {
             if (catId === 'etudes') {
-                if (mode === 'vacances' || mode === 'weekend') {
-                    if (score <= 5) return "Aucune lecture ou révision (Repos total)";
+                if (mode === 'weekend') {
+                    if (score <= 5) return "0 min de devoirs (Repos total du week-end)";
+                    if (score <= 12) return "1h de révisions ou devoirs en avance (~1h)";
+                    return "2h+ de travail personnel / révisions sérieuses ce week-end";
+                }
+                if (mode === 'vacances') {
+                    if (score <= 5) return "Aucune révision ni lecture (Vacances pures)";
                     if (score <= 12) return "Légère lecture ou rangement de cours (~30 min)";
                     return "Avancée sur les projets ou révisions anticipées (1h+)";
                 }
+                // Jour de cours
                 if (score <= 4) return "0 min de devoirs, inattention totale en cours";
                 if (score <= 8) return "30 min de devoirs vite faits, concentration en baisse";
                 if (score <= 13) return "1h à 1h30 de travail personnel / révisions sérieuses";
                 if (score <= 17) return "2h de révision efficace, fiches faites, participation active";
                 return "3h+ de travail personnel, exercices complexes maîtrisés";
             } else if (catId === 'social') {
-                if (score <= 4) return "0 interaction sociale de qualité (isolement)";
-                if (score <= 8) return "Discussions rapides au lycée ou messages en ligne";
-                if (score <= 13) return "Temps de qualité partagé avec des proches ou discussions enrichissantes (~1h)";
-                if (score <= 17) return "Sortie entre amis, moments forts partagés et écoute active en famille";
-                return "Excellente connexion sociale, moments forts et entraide active";
+                if (mode === 'weekend') {
+                    if (score <= 4) return "Resté enfermé tout le week-end sans voir personne";
+                    if (score <= 8) return "Quelques messages ou brève discussion en famille";
+                    if (score <= 13) return "Bon moment partagé en famille ou sortie rapide (~2h)";
+                    if (score <= 17) return "Grosse sortie entre amis ou journée en famille enrichissante";
+                    return "Super week-end social, moments inoubliables partagés";
+                }
+                if (mode === 'vacances') {
+                    if (score <= 4) return "Isolement total pendant les vacances";
+                    if (score <= 8) return "Contacts réguliers par messages / réseaux";
+                    if (score <= 13) return "Sortie ou temps de qualité passé avec des proches (~2h)";
+                    if (score <= 17) return "Bonnes sorties régulières et moments forts entre amis/famille";
+                    return "Vie sociale très riche et épanouissante au quotidien";
+                }
+                // Jour de cours
+                if (score <= 4) return "0 interaction sociale de qualité (isolement au lycée)";
+                if (score <= 8) return "Discussions rapides à la pause ou messages en ligne";
+                if (score <= 13) return "Temps de qualité partagé avec des potes ou proches (~1h)";
+                if (score <= 17) return "Bonne pause méridienne, rires et écoute active en famille";
+                return "Excellente connexion sociale, entraide et moments forts";
             } else if (catId === 'activites') {
-                if (score <= 4) return "Aucun loisir actif (uniquement scroll ou passivité)";
-                if (score <= 8) return "30 min de détente (jeux, série sans excès)";
-                if (score <= 13) return "45 min à 1h de sport, pratique artistique ou projet perso";
-                if (score <= 17) return "1h30 de sport ou de passion active (entraînement, création)";
-                return "2h+ d'activité physique ou passionnante et épanouissante";
+                if (mode === 'weekend') {
+                    if (score <= 4) return "Journée 100% canapé / écrans passifs";
+                    if (score <= 8) return "Petite promenade ou loisir modéré (~45 min)";
+                    if (score <= 13) return "1h30 de sport, match ou activité créative/passion";
+                    if (score <= 17) return "2h30 à 3h d'activité physique ou projet personnel poussé";
+                    return "Journée très active (gros entraînement, rando, passion à fond)";
+                }
+                if (mode === 'vacances') {
+                    if (score <= 4) return "Aucune activité physique ni loisir constructif";
+                    if (score <= 8) return "Loisir léger ou petite sortie (~45 min)";
+                    if (score <= 13) return "1h30 de sport, balade ou projet personnel";
+                    if (score <= 17) return "2h+ de sport ou de pratique artistique/créative";
+                    return "Journée bien remplie en activités et passions (3h+)";
+                }
+                // Jour de cours (temps réduit à cause des cours)
+                if (score <= 4) return "Aucun sport ni loisir actif (uniquement les cours et les écrans)";
+                if (score <= 8) return "30 min de marche, détente rapide ou petit étirement";
+                if (score <= 13) return "45 min de sport après les cours, guitare ou projet perso";
+                if (score <= 17) return "1h à 1h15 d'entraînement sportif ou d'activité passion soutenue";
+                return "1h30+ de sport intense ou d'activité créative malgré les cours";
             } else if (catId === 'sommeil') {
-                if (score <= 4) return "Moins de 6h de sommeil, fatigue intense, stress élevé";
-                if (score <= 8) return "6h à 6h30 de sommeil, réveil difficile";
-                if (score <= 13) return "7h à 7h30 de sommeil, forme correcte";
-                if (score <= 17) return "8h de sommeil réparateur et moments de détente";
-                return "8h30+ de sommeil de qualité, super forme et zénitude totale";
+                if (mode === 'weekend' || mode === 'vacances') {
+                    if (score <= 4) return "Nuit chaotique, coucher très tardif et réveil difficile";
+                    if (score <= 8) return "Sommeil moyen ou décalé";
+                    if (score <= 13) return "8h de sommeil récupérateur";
+                    if (score <= 17) return "9h de sommeil de qualité, super forme";
+                    return "9h30+ de sommeil parfait, repos total et sérénité";
+                }
+                // Jour de cours
+                if (score <= 4) return "Moins de 6h de sommeil, fatigue intense, réveil difficile";
+                if (score <= 8) return "6h à 6h30 de sommeil, coup de fatigue en cours de journée";
+                if (score <= 13) return "7h à 7h30 de sommeil, forme correcte pour la journée";
+                if (score <= 17) return "8h de sommeil réparateur, réveil en forme";
+                return "8h30+ de sommeil optimal, pleine énergie pour les cours";
             }
             if (score <= 4) return "Effort minime ou inexistant";
             if (score <= 10) return "Effort modéré (~30 min)";
@@ -527,7 +671,7 @@
         }
 
         function switchTab(tabId) {
-            ['dashboard', 'history', 'goals', 'categories', 'mobile-app'].forEach(id => {
+            ['dashboard', 'history', 'goals', 'categories', 'mobile-app', 'cloud-sync'].forEach(id => {
                 document.getElementById(`tab-${id}`).classList.add('hidden');
                 document.getElementById(`nav-${id}`).className = "px-3 py-2 text-xs sm:text-sm font-semibold rounded-xl transition-all text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 shrink-0";
             });
@@ -562,22 +706,32 @@
 
         // Notification Management System
         function initNotificationsUI() {
-            const enabled = localStorage.getItem('effort_notif_20h') === 'true';
+            const enabled = localStorage.getItem('effort_notif_enabled') === 'true';
+            const savedTime = localStorage.getItem('effort_notif_time') || '20:00';
+            
+            document.getElementById('notif-time-input').value = savedTime;
+
             const btn = document.getElementById('notif-btn');
             const label = document.getElementById('notif-label');
             if (enabled) {
-                label.innerText = "Statut : Actif (20h00)";
+                label.innerText = `Statut : Actif (${savedTime})`;
                 btn.innerText = "Désactiver";
                 btn.className = "px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold rounded-xl transition shadow";
             } else {
                 label.innerText = "Statut : Inactif";
-                btn.innerText = "Activer 20h";
+                btn.innerText = "Activer le rappel";
                 btn.className = "px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-xl transition shadow";
             }
         }
 
+        function updateNotifTime(newTime) {
+            localStorage.setItem('effort_notif_time', newTime);
+            initNotificationsUI();
+            showToast(`Heure de rappel mise à jour (${newTime}) !`);
+        }
+
         async function toggleNotifications() {
-            const enabled = localStorage.getItem('effort_notif_20h') === 'true';
+            const enabled = localStorage.getItem('effort_notif_enabled') === 'true';
             if (!enabled) {
                 if (!("Notification" in window)) {
                     alert("Ton navigateur ne supporte pas les notifications.");
@@ -585,15 +739,15 @@
                 }
                 const permission = await Notification.requestPermission();
                 if (permission === "granted") {
-                    localStorage.setItem('effort_notif_20h', 'true');
-                    showToast("Rappel de 20h activé avec succès !");
+                    localStorage.setItem('effort_notif_enabled', 'true');
+                    showToast("Rappel quotidien activé avec succès !");
                 } else {
                     alert("Permission de notification refusée dans le navigateur.");
                     return;
                 }
             } else {
-                localStorage.setItem('effort_notif_20h', 'false');
-                showToast("Rappel de 20h désactivé.");
+                localStorage.setItem('effort_notif_enabled', 'false');
+                showToast("Rappel quotidien désactivé.");
             }
             initNotificationsUI();
         }
@@ -618,8 +772,11 @@
 
         function startNotificationChecker() {
             setInterval(() => {
-                const enabled = localStorage.getItem('effort_notif_20h') === 'true';
+                const enabled = localStorage.getItem('effort_notif_enabled') === 'true';
                 if (!enabled) return;
+
+                const targetTime = localStorage.getItem('effort_notif_time') || '20:00';
+                const [targetHour, targetMinute] = targetTime.split(':').map(Number);
 
                 const now = new Date();
                 const hours = now.getHours();
@@ -627,10 +784,10 @@
                 const todayKey = now.toISOString().split('T')[0];
                 const lastNotifDate = localStorage.getItem('effort_last_notif_date');
 
-                if (hours === 20 && minutes === 0 && lastNotifDate !== todayKey) {
+                if (hours === targetHour && minutes === targetMinute && lastNotifDate !== todayKey) {
                     if ("Notification" in window && Notification.permission === "granted") {
-                        new Notification("Bilan du soir 🌙 - EffortTracker", {
-                            body: "Il est 20h ! Pense à noter ta journée (études, vie sociale, sommeil...) pour garder le cap.",
+                        new Notification(`Bilan du soir 🌙 - EffortTracker (${targetTime})`, {
+                            body: `Il est ${targetTime} ! Pense à noter ta journée (études, vie sociale, sommeil...) pour garder le cap.`,
                             icon: "https://placehold.co/192x192/16a34a/ffffff?text=ET"
                         });
                         localStorage.setItem('effort_last_notif_date', todayKey);
