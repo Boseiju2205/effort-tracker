@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EffortTracker Pro - Lycée</title>
-    <!-- PWA & Mobile Icons -->
-    <link rel="apple-touch-icon" href="https://placehold.co/192x192/16a34a/ffffff?text=ET">
-    <link rel="icon" type="image/png" href="https://placehold.co/192x192/16a34a/ffffff?text=ET">
+    <!-- PWA & Mobile Icons with SVG Data URI fallback -->
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%2316a34a%22/><text x=%2250%%22 y=%2255%%22 font-size=%2250%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22 fill=%22%23ffffff%22 font-weight=%22bold%22 font-family=%22sans-serif%22>ET</text></svg>">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%2316a34a%22/><text x=%2250%%22 y=%2255%%22 font-size=%2250%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22 fill=%22%23ffffff%22 font-weight=%22bold%22 font-family=%22sans-serif%22>ET</text></svg>">
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -70,7 +70,7 @@
                 </div>
             </div>
             
-            <!-- Navigation Tabs (Optimized for horizontal scroll & touch on mobile) -->
+            <!-- Navigation Tabs -->
             <div class="flex items-center space-x-1 overflow-x-auto py-2 no-scrollbar max-w-[calc(100vw-120px)] sm:max-w-none">
                 <button onclick="switchTab('dashboard')" id="nav-dashboard" class="px-3 py-1.5 text-xs font-semibold rounded-xl transition-all bg-emerald-50 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 shrink-0 flex items-center space-x-1">
                     <i class="fa-solid fa-calendar-day"></i><span>Aujourd'hui</span>
@@ -105,9 +105,8 @@
     <!-- Main Container -->
     <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
 
-        <!-- TAB 1 : DASHBOARD (Aujourd'hui) -->
+        <!-- TAB 1 : DASHBOARD -->
         <section id="tab-dashboard" class="space-y-8">
-            <!-- Top Summary Card with Mode Selector & Quote -->
             <div class="bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-700 rounded-3xl p-6 sm:p-8 text-white shadow-xl flex flex-col lg:flex-row items-center justify-between gap-6">
                 <div class="space-y-3 text-center lg:text-left w-full lg:w-auto">
                     <div class="flex flex-wrap items-center justify-center lg:justify-start gap-2">
@@ -115,31 +114,111 @@
                             <i class="fa-regular fa-calendar"></i>
                             <span id="current-date-label">Chargement...</span>
                         </span>
-                        <!-- Mode selector (Cours / Weekend / Vacances) -->
-                        <select id="day-mode-select" onchange="changeDayMode(this.value)" class="bg-white/20 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-semibold focus:outline-none border border-white/30 cursor-pointer">
+                        <select id="day-mode-select" onchange="resetAkinatorQuiz(this.value)" class="bg-white/20 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-semibold focus:outline-none border border-white/30 cursor-pointer">
                             <option value="cours" class="bg-slate-800 text-white">📚 Jour de Cours</option>
                             <option value="weekend" class="bg-slate-800 text-white">🌴 Week-end</option>
                             <option value="vacances" class="bg-slate-800 text-white">🏖️ Vacances</option>
                         </select>
                     </div>
-                    <h2 class="text-2xl sm:text-3xl font-extrabold">Bilan Quotidien</h2>
-                    <!-- Dynamic motivational quote based on score -->
+                    <h2 class="text-2xl sm:text-3xl font-extrabold">Évaluation Intelligente</h2>
                     <p id="daily-quote" class="text-emerald-100 text-sm max-w-xl italic">
-                        "Chaque petit effort compte pour construire ton avenir."
+                        "Réponds aux questions une par une pour calculer ta note idéale."
                     </p>
                 </div>
                 
                 <div class="flex flex-col sm:flex-row gap-4 items-center">
-                    <!-- 7-day moving average badge -->
                     <div class="bg-white/10 backdrop-blur-md border border-white/20 p-4 rounded-2xl flex flex-col items-center justify-center min-w-[140px] shadow-inner">
-                        <span class="text-[10px] uppercase tracking-wider font-semibold text-emerald-200">Moyenne Mobile 7j</span>
+                        <span class="text-[10px] uppercase tracking-wider font-semibold text-emerald-200">Moyenne 7j</span>
                         <div class="flex items-baseline space-x-1 mt-1">
                             <span id="moving-avg" class="text-2xl font-bold">--</span>
                             <span class="text-sm font-medium text-emerald-200">/20</span>
                         </div>
                     </div>
 
-                    <!-- Global Score Card -->
+                    <div class="bg-white/15 backdrop-blur-md border border-white/25 p-6 rounded-2xl flex flex-col items-center justify-center min-w-[180px] shadow-inner">
+                        <span class="text-xs uppercase tracking-wider font-semibold text-emerald-100">Note Finale Calculée</span>
+                        <div class="flex items-baseline space-x-1 mt-1">
+                            <span id="global-score" class="text-5xl font-black">--</span>
+                            <span class="text-xl font-medium text-emerald-200">/20</span>
+                        </div>
+                        <span id="global-status" class="mt-2 text-xs font-medium px-3 py-1 rounded-full bg-white/25 text-white">En cours du test...</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Dynamic Akinator Interactive Quiz Box -->
+                <div class="lg:col-span-2 space-y-6">
+                    <div id="akinator-card" class="bg-white dark:bg-slate-800 p-6 sm:p-8 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-xl space-y-6 relative overflow-hidden">
+                        
+                        <!-- Progress Bar & Category Badge -->
+                        <div class="flex items-center justify-between">
+                            <span id="quiz-cat-badge" class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 flex items-center space-x-1.5">
+                                <i id="quiz-cat-icon" class="fa-solid fa-graduation-cap"></i>
+                                <span id="quiz-cat-name">Études & Travail</span>
+                            </span>
+                            <span id="quiz-step-counter" class="text-xs font-semibold text-slate-400">Question 1</span>
+                        </div>
+
+                        <!-- Question Text -->
+                        <div class="space-y-2 py-2">
+                            <h3 id="quiz-question-title" class="text-lg sm:text-xl font-bold text-slate-800 dark:text-slate-100">
+                                Chargement de la question...
+                            </h3>
+                            <p id="quiz-question-subtitle" class="text-xs text-slate-500 dark:text-slate-400">
+                                Ta réponse ajustera automatiquement la suite de l'arbre de questions.
+                            </p>
+                        </div>
+
+                        <!-- Answers Choices Container -->
+                        <div id="quiz-answers-container" class="grid grid-cols-1 gap-3"></div>
+
+                        <!-- Controls (Back & Restart) -->
+                        <div class="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-700">
+                            <button id="btn-prev-question" onclick="prevAkinatorQuestion()" class="px-4 py-2 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 text-slate-600 dark:text-slate-300 rounded-xl text-xs font-semibold transition flex items-center space-x-2">
+                                <i class="fa-solid fa-arrow-left"></i><span>Question précédente</span>
+                            </button>
+                            <button onclick="resetAkinatorQuiz()" class="text-xs text-slate-400 hover:text-rose-500 transition flex items-center space-x-1">
+                                <i class="fa-solid fa-rotate-right"></i><span>Recommencer</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Journal Note & Save -->
+                    <div id="quiz-notes-box" class="bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-3">
+                        <label for="day-notes" class="block font-bold text-slate-800 dark:text-slate-100 flex items-center space-x-2">
+                            <i class="fa-solid fa-book-open text-amber-500"></i>
+                            <span>Journal rapide du jour</span>
+                        </label>
+                        <textarea id="day-notes" rows="2" placeholder="Ex: Devoir de philo réussi, bonne ambiance..." class="w-full px-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none"></textarea>
+                    </div>
+
+                    <div class="pt-2 flex flex-wrap items-center justify-between gap-4">
+                        <button onclick="copyDiscordSummary()" class="px-5 py-3 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-semibold rounded-2xl transition flex items-center space-x-2 text-sm">
+                            <i class="fa-solid fa-copy"></i>
+                            <span>Copier le résumé</span>
+                        </button>
+
+                        <button onclick="saveTodayData()" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-2xl shadow-lg shadow-emerald-600/20 transition flex items-center space-x-2 text-sm">
+                            <i class="fa-solid fa-floppy-disk"></i>
+                            <span>Enregistrer la journée</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Sidebar Info & Controls -->
+                <div class="space-y-6">
+                    <!-- Calculated Category Scores Summary -->
+                    <div class="bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-4">
+                        <h4 class="font-bold text-slate-800 dark:text-slate-100 flex items-center space-x-2">
+                            <i class="fa-solid fa-calculator text-emerald-600"></i>
+                            <span>Notes Estimées par le Robot</span>
+                        </h4>
+                        <div id="calculated-cat-list" class="space-y-3 text-xs">
+                            <!-- Filled dynamically -->
+                        </div>
+                    </div>
+
                     <div class="bg-white/15 backdrop-blur-md border border-white/25 p-6 rounded-2xl flex flex-col items-center justify-center min-w-[180px] shadow-inner">
                         <span class="text-xs uppercase tracking-wider font-semibold text-emerald-100">Note Globale Pondérée</span>
                         <div class="flex items-baseline space-x-1 mt-1">
@@ -151,9 +230,7 @@
                 </div>
             </div>
 
-            <!-- Main Interactive Form / Sliders & Journal -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <!-- Sliders Section (2 cols) -->
                 <div class="lg:col-span-2 space-y-6">
                     <div class="flex items-center justify-between">
                         <h3 class="text-lg font-bold flex items-center space-x-2">
@@ -163,21 +240,17 @@
                         <span class="text-xs text-slate-500 dark:text-slate-400">Ajuste selon tes repères</span>
                     </div>
 
-                    <div id="sliders-container" class="space-y-6">
-                        <!-- Dynamically injected by JavaScript -->
-                    </div>
+                    <div id="sliders-container" class="space-y-6"></div>
 
-                    <!-- Quick Journal / Notes du jour -->
                     <div class="bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-3">
                         <label for="day-notes" class="block font-bold text-slate-800 dark:text-slate-100 flex items-center space-x-2">
                             <i class="fa-solid fa-book-open text-amber-500"></i>
                             <span>Journal rapide & Faits marquants du jour</span>
                         </label>
-                        <textarea id="day-notes" rows="3" placeholder="Ex: Contrôle de maths réussi, grosse fatigue l'après-midi, super sortie avec les potes..." class="w-full px-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none"></textarea>
+                        <textarea id="day-notes" rows="3" placeholder="Ex: Contrôle de maths réussi, grosse fatigue l'après-midi..." class="w-full px-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none"></textarea>
                     </div>
 
                     <div class="pt-2 flex flex-wrap items-center justify-between gap-4">
-                        <!-- Quick copy button for Discord / Notes -->
                         <button onclick="copyDiscordSummary()" class="px-5 py-3 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-semibold rounded-2xl transition flex items-center space-x-2 text-sm">
                             <i class="fa-solid fa-copy"></i>
                             <span>Copier le résumé (Discord / Notes)</span>
@@ -190,19 +263,14 @@
                     </div>
                 </div>
 
-                <!-- Side Panel: Stats summary & quick tips -->
                 <div class="space-y-6">
-                    <!-- Notification Reminder Panel -->
                     <div class="bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-4">
-                        <div class="flex items-center justify-between">
-                            <h4 class="font-bold text-slate-800 dark:text-slate-100 flex items-center space-x-2">
-                                <i class="fa-solid fa-bell text-emerald-600"></i>
-                                <span>Rappel Quotidien</span>
-                            </h4>
-                        </div>
-                        <p class="text-xs text-slate-500 dark:text-slate-400">Reçois une notification chaque jour à l'heure choisie pour ne jamais oublier de faire ton bilan.</p>
+                        <h4 class="font-bold text-slate-800 dark:text-slate-100 flex items-center space-x-2">
+                            <i class="fa-solid fa-bell text-emerald-600"></i>
+                            <span>Rappel Quotidien</span>
+                        </h4>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Reçois une notification chaque jour à l'heure choisie.</p>
                         
-                        <!-- Time picker for notification -->
                         <div class="flex items-center justify-between pt-1">
                             <label for="notif-time-input" class="text-xs font-semibold text-slate-700 dark:text-slate-300">Heure du rappel :</label>
                             <input type="time" id="notif-time-input" value="20:00" onchange="updateNotifTime(this.value)" class="px-3 py-1.5 bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-bold rounded-xl border border-slate-200 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-emerald-500">
@@ -211,7 +279,7 @@
                         <div id="notif-status-box" class="flex items-center justify-between pt-2">
                             <span id="notif-label" class="text-xs font-semibold text-slate-600 dark:text-slate-300">Statut : Inactif</span>
                             <button id="notif-btn" onclick="toggleNotifications()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-xl transition shadow">
-                                Activer le rappel
+                                Activer
                             </button>
                         </div>
                         <button onclick="testNotification()" class="w-full mt-2 px-3 py-1.5 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-300 text-xs font-semibold rounded-xl transition">
@@ -222,7 +290,7 @@
                     <div class="bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-4">
                         <h4 class="font-bold text-slate-800 dark:text-slate-100 flex items-center space-x-2">
                             <i class="fa-solid fa-fire text-orange-500"></i>
-                            <span>Régularité & Statistiques</span>
+                            <span>Régularité & Stats</span>
                         </h4>
                         <div class="flex items-center justify-between text-sm">
                             <span class="text-slate-500 dark:text-slate-400">Jours enregistrés</span>
@@ -234,13 +302,11 @@
                         </div>
                     </div>
 
-                    <!-- Export / Import buttons container -->
                     <div class="bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-4">
                         <h4 class="font-bold text-slate-800 dark:text-slate-100 flex items-center space-x-2">
                             <i class="fa-solid fa-database text-teal-600"></i>
                             <span>Sauvegarde & Données</span>
                         </h4>
-                        <p class="text-xs text-slate-500 dark:text-slate-400">Tes données sont stockées en local sur ton appareil. Pense à les exporter pour ne rien perdre.</p>
                         <div class="grid grid-cols-2 gap-2">
                             <button onclick="exportJSON()" class="px-3 py-2 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-xs font-semibold rounded-xl transition flex items-center justify-center space-x-1.5">
                                 <i class="fa-solid fa-download"></i><span>JSON</span>
@@ -267,83 +333,40 @@
                 </div>
             </div>
 
-            <!-- Heatmap Calendar (30 days grid) -->
             <div class="bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-4">
                 <h3 class="font-bold text-base flex items-center space-x-2">
                     <i class="fa-solid fa-calendar-days text-emerald-600"></i>
                     <span>Rétrospective des 30 derniers jours (Heatmap)</span>
                 </h3>
-                <p class="text-xs text-slate-500 dark:text-slate-400">Chaque case représente un jour. Plus la couleur est verte, meilleure a été ta journée !</p>
-                <div id="heatmap-container" class="grid grid-cols-6 sm:grid-cols-10 md:grid-cols-15 gap-2.5 pt-2">
-                    <!-- Injected by JS -->
-                </div>
+                <div id="heatmap-container" class="grid grid-cols-6 sm:grid-cols-10 md:grid-cols-15 gap-2.5 pt-2"></div>
             </div>
 
-            <!-- Chart.js Progression Graph -->
             <div class="bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-4">
-                <h3 class="font-bold text-base flex items-center space-x-2">
-                    <i class="fa-solid fa-chart-line text-emerald-600"></i>
-                    <span>Courbe d'Évolution de la Note Pondérée</span>
-                </h3>
-                <div class="h-80 relative">
-                    <canvas id="historyChart"></canvas>
+                <h4 class="font-bold text-slate-800 dark:text-slate-100 flex items-center space-x-2">
+                    <i class="fa-solid fa-bell text-emerald-600"></i>
+                    <span>Rappel Quotidien System Push</span>
+                </h4>
+                <p class="text-xs text-slate-500 dark:text-slate-400">Pour recevoir une vraie notification sur ton téléphone, assure-toi d'avoir ajouté l'application sur ton écran d'accueil depuis ton lien HTTPS (GitHub Pages).</p>
+                
+                <div class="flex items-center justify-between pt-1">
+                    <label for="notif-time-input" class="text-xs font-semibold text-slate-700 dark:text-slate-300">Heure du rappel :</label>
+                    <input type="time" id="notif-time-input" value="20:00" onchange="updateNotifTime(this.value)" class="px-3 py-1.5 bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-bold rounded-xl border border-slate-200 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-emerald-500">
                 </div>
-            </div>
 
-            <!-- Past Days Log Table -->
-            <div class="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
-                <div class="p-6 border-b border-slate-200 dark:border-slate-700">
-                    <h3 class="font-bold text-base">Journal détaillé des entrées</h3>
+                <div id="notif-status-box" class="flex items-center justify-between pt-2">
+                    <span id="notif-label" class="text-xs font-semibold text-slate-600 dark:text-slate-300">Statut : Inactif</span>
+                    <button id="notif-btn" onclick="toggleNotifications()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-xl transition shadow">
+                        Activer
+                    </button>
                 </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse text-sm">
-                        <thead>
-                            <tr class="bg-slate-50 dark:bg-slate-700/50 text-slate-500 dark:text-slate-400 font-semibold uppercase text-xs tracking-wider">
-                                <th class="p-4">Date</th>
-                                <th class="p-4">Note Pondérée</th>
-                                <th class="p-4">Notes & Faits marquants</th>
-                                <th class="p-4 text-right">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="history-table-body" class="divide-y divide-slate-200 dark:divide-slate-700">
-                            <!-- Injected by JS -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-
-        <!-- TAB 3 : OBJECTIFS -->
-        <section id="tab-goals" class="space-y-8 hidden">
-            <div>
-                <h2 class="text-2xl font-extrabold">Objectifs Hebdomadaires par Catégorie</h2>
-                <p class="text-sm text-slate-500 dark:text-slate-400">Définis un score moyen cible à atteindre chaque semaine pour rester motivé.</p>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="goals-container">
-                <!-- Injected by JS -->
-            </div>
-        </section>
-
-        <!-- TAB 4 : CATEGORIES & WEIGHTS -->
-        <section id="tab-categories" class="space-y-8 hidden">
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div>
-                    <h2 class="text-2xl font-extrabold">Gestion des Catégories & Poids</h2>
-                    <p class="text-sm text-slate-500 dark:text-slate-400">Vie Sociale (4x), Études (3x), Activités (2x), Sommeil (1x).</p>
-                </div>
-                <button onclick="openCategoryModal()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl shadow transition flex items-center space-x-2 text-sm">
-                    <i class="fa-solid fa-plus"></i>
-                    <span>Ajouter une catégorie</span>
+                <button onclick="testNotification()" class="w-full mt-2 px-3 py-1.5 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-300 text-xs font-semibold rounded-xl transition">
+                    Envoyer une vraie notification système
                 </button>
             </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" id="categories-grid">
-                <!-- Injected by JS -->
-            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" id="categories-grid"></div>
         </section>
 
-        <!-- TAB 5 : TRANSFORMER EN APP MOBILE -->
+        <!-- TAB 5 : APP MOBILE -->
         <section id="tab-mobile-app" class="space-y-8 hidden">
             <div>
                 <h2 class="text-2xl font-extrabold flex items-center space-x-3">
@@ -351,12 +374,11 @@
                     <span>Transformer en application sur ton téléphone</span>
                 </h2>
                 <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">
-                    Tu n'as pas besoin de télécharger une application sur l'App Store ou Google Play ! Tu peux installer ce site directement sur l'écran d'accueil de ton téléphone en quelques secondes pour l'utiliser comme une vraie app (en plein écran, sans barre d'URL).
+                    Ajoute ce site directement sur l'écran d'accueil de ton téléphone pour l'utiliser comme une vraie application.
                 </p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <!-- iPhone / iOS Guide -->
                 <div class="bg-white dark:bg-slate-800 p-6 sm:p-8 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-6">
                     <div class="flex items-center space-x-3">
                         <div class="p-3 bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-white rounded-2xl text-xl font-bold">
@@ -364,31 +386,25 @@
                         </div>
                         <div>
                             <h3 class="font-bold text-lg">Sur iPhone / iPad (Safari)</h3>
-                            <p class="text-xs text-slate-500">iOS (Safari obligatoire)</p>
+                            <p class="text-xs text-slate-500">iOS</p>
                         </div>
                     </div>
-                    
                     <ol class="space-y-4 text-sm">
                         <li class="flex items-start space-x-3">
-                            <span class="flex items-center justify-center w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 font-bold text-xs shrink-0 mt-0.5">1</span>
-                            <span>Ouvre cette page web dans le navigateur <strong>Safari</strong> de ton iPhone.</span>
+                            <span class="flex items-center justify-center w-6 h-6 rounded-full bg-emerald-100 text-emerald-600 font-bold text-xs shrink-0 mt-0.5">1</span>
+                            <span>Ouvre cette page web dans <strong>Safari</strong>.</span>
                         </li>
                         <li class="flex items-start space-x-3">
-                            <span class="flex items-center justify-center w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 font-bold text-xs shrink-0 mt-0.5">2</span>
-                            <span>Appuie sur le bouton <strong>Partager</strong> en bas de l'écran (l'icône carrée avec une flèche vers le haut <i class="fa-solid fa-arrow-up-from-bracket inline text-blue-500"></i>).</span>
+                            <span class="flex items-center justify-center w-6 h-6 rounded-full bg-emerald-100 text-emerald-600 font-bold text-xs shrink-0 mt-0.5">2</span>
+                            <span>Appuie sur le bouton <strong>Partager</strong> <i class="fa-solid fa-arrow-up-from-bracket inline text-blue-500"></i>.</span>
                         </li>
                         <li class="flex items-start space-x-3">
-                            <span class="flex items-center justify-center w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 font-bold text-xs shrink-0 mt-0.5">3</span>
-                            <span>Fais défiler les options et appuie sur <strong>« Sur l'écran d'accueil »</strong> <i class="fa-solid fa-square-plus inline"></i>.</span>
-                        </li>
-                        <li class="flex items-start space-x-3">
-                            <span class="flex items-center justify-center w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 font-bold text-xs shrink-0 mt-0.5">4</span>
-                            <span>Renomme l'application si tu veux (ex: <em>EffortTracker</em>) et appuie sur <strong>Ajouter</strong> en haut à droite. C'est fait ! L'icône apparaît sur ton écran d'accueil.</span>
+                            <span class="flex items-center justify-center w-6 h-6 rounded-full bg-emerald-100 text-emerald-600 font-bold text-xs shrink-0 mt-0.5">3</span>
+                            <span>Sélectionne <strong>« Sur l'écran d'accueil »</strong>. C'est fait !</span>
                         </li>
                     </ol>
                 </div>
 
-                <!-- Android Guide -->
                 <div class="bg-white dark:bg-slate-800 p-6 sm:p-8 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-6">
                     <div class="flex items-center space-x-3">
                         <div class="p-3 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 rounded-2xl text-xl font-bold">
@@ -396,54 +412,40 @@
                         </div>
                         <div>
                             <h3 class="font-bold text-lg">Sur Android (Chrome)</h3>
-                            <p class="text-xs text-slate-500">Smartphones Samsung, Xiaomi, Google Pixel...</p>
+                            <p class="text-xs text-slate-500">Android</p>
                         </div>
                     </div>
-                    
                     <ol class="space-y-4 text-sm">
                         <li class="flex items-start space-x-3">
-                            <span class="flex items-center justify-center w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 font-bold text-xs shrink-0 mt-0.5">1</span>
-                            <span>Ouvre cette page web dans le navigateur <strong>Google Chrome</strong> de ton téléphone.</span>
+                            <span class="flex items-center justify-center w-6 h-6 rounded-full bg-emerald-100 text-emerald-600 font-bold text-xs shrink-0 mt-0.5">1</span>
+                            <span>Ouvre cette page web dans <strong>Google Chrome</strong>.</span>
                         </li>
                         <li class="flex items-start space-x-3">
-                            <span class="flex items-center justify-center w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 font-bold text-xs shrink-0 mt-0.5">2</span>
-                            <span>Appuie sur le bouton des <strong>trois petits points verticaux</strong> en haut à droite de l'écran <i class="fa-solid fa-ellipsis-vertical inline"></i>.</span>
+                            <span class="flex items-center justify-center w-6 h-6 rounded-full bg-emerald-100 text-emerald-600 font-bold text-xs shrink-0 mt-0.5">2</span>
+                            <span>Appuie sur les <strong>trois points</strong> en haut à droite <i class="fa-solid fa-ellipsis-vertical inline"></i>.</span>
                         </li>
                         <li class="flex items-start space-x-3">
-                            <span class="flex items-center justify-center w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 font-bold text-xs shrink-0 mt-0.5">3</span>
-                            <span>Sélectionne l'option <strong>« Ajouter à l'écran d'accueil »</strong> ou <strong>« Installer l'application »</strong>.</span>
-                        </li>
-                        <li class="flex items-start space-x-3">
-                            <span class="flex items-center justify-center w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 font-bold text-xs shrink-0 mt-0.5">4</span>
-                            <span>Confirme en appuyant sur <strong>Ajouter</strong>. L'icône de l'app s'installe directement parmi tes applications !</span>
+                            <span class="flex items-center justify-center w-6 h-6 rounded-full bg-emerald-100 text-emerald-600 font-bold text-xs shrink-0 mt-0.5">3</span>
+                            <span>Sélectionne <strong>« Ajouter à l'écran d'accueil »</strong>.</span>
                         </li>
                     </ol>
                 </div>
             </div>
-
-            <div class="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800/50 p-6 rounded-3xl flex items-start space-x-4">
-                <i class="fa-solid fa-lightbulb text-emerald-600 text-xl mt-1"></i>
-                <div class="space-y-1 text-sm text-emerald-900 dark:text-emerald-200">
-                    <h4 class="font-bold">Astuce importante</h4>
-                    <p>Comme tes données sont enregistrées dans la mémoire locale de ton navigateur, l'application fonctionnera parfaitement et tu pourras remplir ton bilan chaque soir, même hors-ligne ! Pense simplement à faire une sauvegarde (via le bouton JSON dans l'onglet Aujourd'hui) de temps en temps.</p>
-                </div>
-            </div>
         </section>
 
-        <!-- TAB 6 : CLOUD SYNC & COMPTE -->
+        <!-- TAB 6 : COMPTE & CLOUD -->
         <section id="tab-cloud-sync" class="space-y-8 hidden">
             <div>
                 <h2 class="text-2xl font-extrabold flex items-center space-x-3">
                     <i class="fa-solid fa-cloud text-teal-600"></i>
-                    <span>Synchronisation Cloud & Compte Multi-Appareil</span>
+                    <span>Synchronisation Cloud & Compte</span>
                 </h2>
                 <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">
-                    Connecte-toi ou crée un compte pour sauvegarder ton historique sur le cloud et y accéder depuis ton téléphone, ta tablette ou ton ordinateur.
+                    Connecte-toi pour synchroniser ton historique sur tous tes appareils.
                 </p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <!-- Account Status Card -->
                 <div class="bg-white dark:bg-slate-800 p-6 sm:p-8 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-6">
                     <div class="flex items-center space-x-3">
                         <div class="p-3 bg-teal-100 dark:bg-teal-900/30 text-teal-600 rounded-2xl text-xl font-bold">
@@ -457,7 +459,7 @@
 
                     <div id="account-logged-out" class="space-y-4">
                         <p class="text-sm text-slate-600 dark:text-slate-300">
-                            En créant un compte instantané, tes données seront automatiquement synchronisées et sécurisées dans le cloud.
+                            Crée un compte instantané pour sécuriser et synchroniser tes données.
                         </p>
                         <button onclick="loginAnonymouslyCloud()" class="w-full px-6 py-3 bg-teal-600 hover:bg-teal-700 text-white font-semibold rounded-2xl shadow-lg transition flex items-center justify-center space-x-2 text-sm">
                             <i class="fa-solid fa-bolt"></i>
@@ -468,11 +470,11 @@
                     <div id="account-logged-in" class="space-y-4 hidden">
                         <div class="p-4 bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-2">
                             <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider block">ID Utilisateur Unique</span>
-                            <code id="user-uid-display" class="text-xs font-mono text-teal-600 dark:text-teal-400 break-all block">--</code>
+                            <div class="flex items-center justify-between gap-2">
+                                <code id="user-uid-display" class="text-xs font-mono text-teal-600 dark:text-teal-400 break-all">--</code>
+                                <button onclick="copyUserId()" class="px-2.5 py-1 bg-teal-100 dark:bg-teal-900/40 text-teal-700 dark:text-teal-300 rounded-lg text-xs font-semibold shrink-0">Copier</button>
+                            </div>
                         </div>
-                        <p class="text-xs text-slate-500">
-                            💡 Conserve cet ID ou connecte-toi sur un autre appareil pour retrouver instantanément ton historique.
-                        </p>
                         <button onclick="syncNowToCloud()" class="w-full px-5 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-2xl transition flex items-center justify-center space-x-2 text-sm">
                             <i class="fa-solid fa-rotate"></i>
                             <span>Forcer la synchronisation Cloud</span>
@@ -483,7 +485,6 @@
                     </div>
                 </div>
 
-                <!-- Info Card -->
                 <div class="bg-white dark:bg-slate-800 p-6 sm:p-8 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-6">
                     <div class="flex items-center space-x-3">
                         <div class="p-3 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 rounded-2xl text-xl font-bold">
@@ -501,11 +502,7 @@
                         </li>
                         <li class="flex items-start space-x-2">
                             <i class="fa-solid fa-check text-emerald-600 mt-1"></i>
-                            <span>Aucun mot de passe compliqué à retenir : authentification instantanée.</span>
-                        </li>
-                        <li class="flex items-start space-x-2">
-                            <i class="fa-solid fa-check text-emerald-600 mt-1"></i>
-                            <span>Fonctionne en tandem avec le stockage local pour zéro perte de données.</span>
+                            <span>Aucun mot de passe compliqué à retenir.</span>
                         </li>
                     </ul>
                 </div>
@@ -528,7 +525,7 @@
                 <input type="hidden" id="cat-edit-id">
                 <div>
                     <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">Nom de la catégorie</label>
-                    <input type="text" id="cat-name" required placeholder="Ex: Projet perso, Langues..." class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm">
+                    <input type="text" id="cat-name" required placeholder="Ex: Projet perso..." class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm">
                 </div>
 
                 <div>
@@ -554,101 +551,650 @@
 
     <!-- Application JavaScript Logic -->
     <script>
-        const defaultCategories = [
-            { id: 'social', name: 'Vie Sociale & Proches', icon: 'fa-solid fa-users', weight: 4 },
-            { id: 'etudes', name: 'Études & Cours', icon: 'fa-solid fa-graduation-cap', weight: 3 },
-            { id: 'activites', name: 'Activités & Loisirs/Sport', icon: 'fa-solid fa-dumbbell', weight: 2 },
-            { id: 'sommeil', name: 'Sommeil & Bien-être', icon: 'fa-solid fa-bed', weight: 1 }
+        // Global Data & Initial State
+        let categories = JSON.parse(localStorage.getItem('effort_categories')) || [
+            { id: 'etudes', name: 'Études & Travail', weight: 4, icon: 'fa-solid fa-book-open' },
+            { id: 'social', name: 'Vie Sociale & Équilibre', weight: 3, icon: 'fa-solid fa-users' },
+            { id: 'activites', name: 'Activités & Sport', weight: 2, icon: 'fa-solid fa-person-running' },
+            { id: 'sommeil', name: 'Sommeil & Forme', weight: 3, icon: 'fa-solid fa-bed' }
         ];
 
-        function getCategoryBenchmark(catId, score, mode) {
-            if (catId === 'etudes') {
-                if (mode === 'weekend') {
-                    if (score <= 5) return "0 min de devoirs (Repos total du week-end)";
-                    if (score <= 12) return "1h de révisions ou devoirs en avance (~1h)";
-                    return "2h+ de travail personnel / révisions sérieuses ce week-end";
-                }
-                if (mode === 'vacances') {
-                    if (score <= 5) return "Aucune révision ni lecture (Vacances pures)";
-                    if (score <= 12) return "Légère lecture ou rangement de cours (~30 min)";
-                    return "Avancée sur les projets ou révisions anticipées (1h+)";
-                }
-                // Jour de cours
-                if (score <= 4) return "0 min de devoirs, inattention totale en cours";
-                if (score <= 8) return "30 min de devoirs vite faits, concentration en baisse";
-                if (score <= 13) return "1h à 1h30 de travail personnel / révisions sérieuses";
-                if (score <= 17) return "2h de révision efficace, fiches faites, participation active";
-                return "3h+ de travail personnel, exercices complexes maîtrisés";
-            } else if (catId === 'social') {
-                if (mode === 'weekend') {
-                    if (score <= 4) return "Resté enfermé tout le week-end sans voir personne";
-                    if (score <= 8) return "Quelques messages ou brève discussion en famille";
-                    if (score <= 13) return "Bon moment partagé en famille ou sortie rapide (~2h)";
-                    if (score <= 17) return "Grosse sortie entre amis ou journée en famille enrichissante";
-                    return "Super week-end social, moments inoubliables partagés";
-                }
-                if (mode === 'vacances') {
-                    if (score <= 4) return "Isolement total pendant les vacances";
-                    if (score <= 8) return "Contacts réguliers par messages / réseaux";
-                    if (score <= 13) return "Sortie ou temps de qualité passé avec des proches (~2h)";
-                    if (score <= 17) return "Bonnes sorties régulières et moments forts entre amis/famille";
-                    return "Vie sociale très riche et épanouissante au quotidien";
-                }
-                // Jour de cours
-                if (score <= 4) return "0 interaction sociale de qualité (isolement au lycée)";
-                if (score <= 8) return "Discussions rapides à la pause ou messages en ligne";
-                if (score <= 13) return "Temps de qualité partagé avec des potes ou proches (~1h)";
-                if (score <= 17) return "Bonne pause méridienne, rires et écoute active en famille";
-                return "Excellente connexion sociale, entraide et moments forts";
-            } else if (catId === 'activites') {
-                if (mode === 'weekend') {
-                    if (score <= 4) return "Journée 100% canapé / écrans passifs";
-                    if (score <= 8) return "Petite promenade ou loisir modéré (~45 min)";
-                    if (score <= 13) return "1h30 de sport, match ou activité créative/passion";
-                    if (score <= 17) return "2h30 à 3h d'activité physique ou projet personnel poussé";
-                    return "Journée très active (gros entraînement, rando, passion à fond)";
-                }
-                if (mode === 'vacances') {
-                    if (score <= 4) return "Aucune activité physique ni loisir constructif";
-                    if (score <= 8) return "Loisir léger ou petite sortie (~45 min)";
-                    if (score <= 13) return "1h30 de sport, balade ou projet personnel";
-                    if (score <= 17) return "2h+ de sport ou de pratique artistique/créative";
-                    return "Journée bien remplie en activités et passions (3h+)";
-                }
-                // Jour de cours (temps réduit à cause des cours)
-                if (score <= 4) return "Aucun sport ni loisir actif (uniquement les cours et les écrans)";
-                if (score <= 8) return "30 min de marche, détente rapide ou petit étirement";
-                if (score <= 13) return "45 min de sport après les cours, guitare ou projet perso";
-                if (score <= 17) return "1h à 1h15 d'entraînement sportif ou d'activité passion soutenue";
-                return "1h30+ de sport intense ou d'activité créative malgré les cours";
-            } else if (catId === 'sommeil') {
-                if (mode === 'weekend' || mode === 'vacances') {
-                    if (score <= 4) return "Nuit chaotique, coucher très tardif et réveil difficile";
-                    if (score <= 8) return "Sommeil moyen ou décalé";
-                    if (score <= 13) return "8h de sommeil récupérateur";
-                    if (score <= 17) return "9h de sommeil de qualité, super forme";
-                    return "9h30+ de sommeil parfait, repos total et sérénité";
-                }
-                // Jour de cours
-                if (score <= 4) return "Moins de 6h de sommeil, fatigue intense, réveil difficile";
-                if (score <= 8) return "6h à 6h30 de sommeil, coup de fatigue en cours de journée";
-                if (score <= 13) return "7h à 7h30 de sommeil, forme correcte pour la journée";
-                if (score <= 17) return "8h de sommeil réparateur, réveil en forme";
-                return "8h30+ de sommeil optimal, pleine énergie pour les cours";
-            }
-            if (score <= 4) return "Effort minime ou inexistant";
-            if (score <= 10) return "Effort modéré (~30 min)";
-            return "Engagement fort (~1h30+)";
-        }
+        // Extended Decision Tree Structure (Akinator Style - 25+ Questions & Up to 4 Choice Options)
+        const akinatorDecisionTree = {
+            cours: {
+                start: 'etudes_1',
+                nodes: {
+                    // --- ETUDES & TRAVAIL BRANCH ---
+                    etudes_1: {
+                        catId: 'etudes',
+                        question: "As-tu travaillé tes cours ou fait tes devoirs aujourd'hui ?",
+                        answers: [
+                            { label: "Oui, session intense et productive !", next: 'etudes_2_high' },
+                            { label: "Oui, un travail régulier et correct", next: 'etudes_2_mid' },
+                            { label: "Très peu (relecture rapide / sac)", next: 'etudes_2_low' },
+                            { label: "Non, absolument rien du tout", next: 'etudes_0_reason' }
+                        ]
+                    },
+                    etudes_2_high: {
+                        catId: 'etudes',
+                        question: "Combien de temps y as-tu consacré en tout (cours + maison) ?",
+                        answers: [
+                            { label: "Plus de 2 heures d'effort personnel", next: 'etudes_3_focus', addScore: 19 },
+                            { label: "Entre 1h et 2h", next: 'etudes_3_focus', addScore: 16 },
+                            { label: "Entre 30 min et 1h", next: 'etudes_3_focus', addScore: 14 },
+                            { label: "Moins de 30 min", next: 'etudes_3_focus', addScore: 11 }
+                        ]
+                    },
+                    etudes_2_mid: {
+                        catId: 'etudes',
+                        question: "Quel était l'objectif principal de ce travail ?",
+                        answers: [
+                            { label: "Préparer un devoir / contrôle important", next: 'etudes_3_focus', addScore: 15 },
+                            { label: "Faire les devoirs obligatoires du jour", next: 'etudes_3_focus', addScore: 13 },
+                            { label: "Faire des fiches ou de l'avance", next: 'etudes_3_focus', addScore: 16 },
+                            { label: "Juste régler l'urgence du lendemain", next: 'etudes_3_focus', addScore: 10 }
+                        ]
+                    },
+                    etudes_2_low: {
+                        catId: 'etudes',
+                        question: "Pourquoi n'as-tu pas poussé le travail plus loin ?",
+                        answers: [
+                            { label: "Pas de devoirs donnés par les profs", next: 'etudes_3_focus', addScore: 11 },
+                            { label: "Trop fatigué après les cours", next: 'etudes_3_focus', addScore: 8 },
+                            { label: "J'ai préféré privilégier mes loisirs", next: 'etudes_3_focus', addScore: 7 },
+                            { label: "Bloqué / Rien compris au cours", next: 'etudes_3_focus', addScore: 6 }
+                        ]
+                    },
+                    etudes_0_reason: {
+                        catId: 'etudes',
+                        question: "Quelle était la raison principale de cette journée sans travail ?",
+                        answers: [
+                            { label: "Journée de pause assumée", next: 'social_1', score: 6 },
+                            { label: "Grosse flemme / procrastination", next: 'social_1', score: 3 },
+                            { label: "Imprévu / Problème personnel", next: 'social_1', score: 5 },
+                            { label: "Planning de cours très allégé", next: 'social_1', score: 7 }
+                        ]
+                    },
+                    etudes_3_focus: {
+                        catId: 'etudes',
+                        question: "Comment évalues-tu ta concentration durant les cours en classe ?",
+                        answers: [
+                            { label: "Maximale : participatif et attentif à 100%", next: 'etudes_4_org', scoreCalc: (b) => Math.min(20, b + 2) },
+                            { label: "Correcte : j'ai suivi l'essentiel", next: 'etudes_4_org', scoreCalc: (b) => b },
+                            { label: "Passable : souvent sur mon téléphone / distrait", next: 'etudes_4_org', scoreCalc: (b) => Math.max(0, b - 2) },
+                            { label: "Nulle : j'ai décroché presque tout le long", next: 'etudes_4_org', scoreCalc: (b) => Math.max(0, b - 4) }
+                        ]
+                    },
+                    etudes_4_org: {
+                        catId: 'etudes',
+                        question: "Ton espace de travail et ton sac étaient-ils bien organisés ?",
+                        answers: [
+                            { label: "Impeccable, tout était prêt et clair", next: 'social_1', scoreCalc: (b) => Math.min(20, b + 1) },
+                            { label: "Ça allait, organisation standard", next: 'social_1', scoreCalc: (b) => b },
+                            { label: "Un peu chaotique mais je m'y retrouve", next: 'social_1', scoreCalc: (b) => b },
+                            { label: "Désordre total / affaires oubliées", next: 'social_1', scoreCalc: (b) => Math.max(0, b - 2) }
+                        ]
+                    },
 
-        let categories = JSON.parse(localStorage.getItem('effort_categories')) || defaultCategories;
+                    // --- VIE SOCIALE & EQUILIBRE BRANCH ---
+                    social_1: {
+                        catId: 'social',
+                        question: "As-tu interagi positivement avec des proches ou des amis ?",
+                        answers: [
+                            { label: "Excellentes interactions, super ambiance !", next: 'social_2_depth' },
+                            { label: "Échanges normaux et sympathiques", next: 'social_2_depth' },
+                            { label: "Peu d'interactions (journée très calme)", next: 'social_2_quiet' },
+                            { label: "Tensions ou disputes désagréables", next: 'social_conflict' }
+                        ]
+                    },
+                    social_2_depth: {
+                        catId: 'social',
+                        question: "Combien de temps as-tu consacré à ces moments de partage ?",
+                        answers: [
+                            { label: "Une vraie sortie / grand moment ensemble", next: 'social_3_feeling', addScore: 19 },
+                            { label: "Plusieurs discussions sympas dans la journée", next: 'social_3_feeling', addScore: 16 },
+                            { label: "Juste pendant les pauses de récréation/repas", next: 'social_3_feeling', addScore: 13 },
+                            { label: "Quelques messages virtuels seulement", next: 'social_3_feeling', addScore: 10 }
+                        ]
+                    },
+                    social_2_quiet: {
+                        catId: 'social',
+                        question: "Comment as-tu vécu cette journée au calme ou en solo ?",
+                        answers: [
+                            { label: "Très bien, j'avais besoin de me ressourcer", next: 'social_3_feeling', addScore: 14 },
+                            { label: "Correctement, ni bien ni mal", next: 'social_3_feeling', addScore: 11 },
+                            { label: "Un sentiment de solitude pesant", next: 'social_3_feeling', addScore: 7 },
+                            { label: "J'ai esquivé les autres par fatigue", next: 'social_3_feeling', addScore: 9 }
+                        ]
+                    },
+                    social_conflict: {
+                        catId: 'social',
+                        question: "Ces tensions ont-elles gâché une grande partie de ta journée ?",
+                        answers: [
+                            { label: "Oui, gros impact émotionnel", next: 'activites_1', score: 4 },
+                            { label: "Un peu, mais c'est réglé", next: 'activites_1', score: 8 },
+                            { label: "Non, j'ai réussi à passer au-dessus", next: 'activites_1', score: 11 },
+                            { label: "C'était une broutille oubliée vite", next: 'activites_1', score: 13 }
+                        ]
+                    },
+                    social_3_feeling: {
+                        catId: 'social',
+                        question: "Te sens-tu soutenu, écouté et entouré dans ton entourage ?",
+                        answers: [
+                            { label: "Totalement, j'ai une super communauté", next: 'activites_1', scoreCalc: (b) => Math.min(20, b + 1) },
+                            { label: "Plutôt oui dans l'ensemble", next: 'activites_1', scoreCalc: (b) => b },
+                            { label: "Moyen, j'aimerais plus d'attention", next: 'activites_1', scoreCalc: (b) => Math.max(0, b - 2) },
+                            { label: "Pas du tout en ce moment", next: 'activites_1', scoreCalc: (b) => Math.max(0, b - 4) }
+                        ]
+                    },
+
+                    // --- ACTIVITES & SPORT BRANCH ---
+                    activites_1: {
+                        catId: 'activites',
+                        question: "As-tu pratiqué du sport ou une activité physique aujourd'hui ?",
+                        answers: [
+                            { label: "Oui, une séance intense / entraînement (1h+)", next: 'activites_2_sport_detail', addScore: 19 },
+                            { label: "Oui, de l'exercice modéré / de la marche", next: 'activites_2_sport_detail', addScore: 15 },
+                            { label: "Uniquement des déplacements obligatoires", next: 'activites_2_hobbies', addScore: 10 },
+                            { label: "Non, sédentarité totale aujourd'hui", next: 'activites_2_hobbies', addScore: 6 }
+                        ]
+                    },
+                    activites_2_sport_detail: {
+                        catId: 'activites',
+                        question: "Comment te sens-tu physiquement après cet effort ?",
+                        answers: [
+                            { label: "En pleine forme et revitalisé !", next: 'activites_3_creative', scoreCalc: (b) => Math.min(20, b + 1) },
+                            { label: "Bonne fatigue musculaire saine", next: 'activites_3_creative', scoreCalc: (b) => b },
+                            { label: "Courbatures lourdes / Épuisement", next: 'activites_3_creative', scoreCalc: (b) => Math.max(0, b - 2) },
+                            { label: "Petite douleur / Risque de blessure", next: 'activites_3_creative', scoreCalc: (b) => Math.max(0, b - 3) }
+                        ]
+                    },
+                    activites_2_hobbies: {
+                        catId: 'activites',
+                        question: "As-tu pris du temps pour une passion créative, musicale ou personnelle ?",
+                        answers: [
+                            { label: "Oui, un vrai projet perso / pratique intense", next: 'activites_3_creative', scoreCalc: (b) => Math.min(20, b + 3) },
+                            { label: "Un moment de détente sympa (lecture/art/jeux)", next: 'activites_3_creative', scoreCalc: (b) => Math.min(20, b + 1) },
+                            { label: "Très peu, juste un peu d'écrans", next: 'activites_3_creative', scoreCalc: (b) => b },
+                            { label: "Rien du tout, flemme totale", next: 'activites_3_creative', scoreCalc: (b) => Math.max(0, b - 2) }
+                        ]
+                    },
+                    activites_3_creative: {
+                        catId: 'activites',
+                        question: "Comment évalues-tu le temps passé devant les écrans passifs (TikTok, Réseaux, TV) ?",
+                        answers: [
+                            { label: "Maîtrisé (Moins d'1 heure)", next: 'sommeil_1', scoreCalc: (b) => Math.min(20, b + 1) },
+                            { label: "Raisonnable (Entre 1h et 2h)", next: 'sommeil_1', scoreCalc: (b) => b },
+                            { label: "Excessif (Plus de 3h d'écrans passifs)", next: 'sommeil_1', scoreCalc: (b) => Math.max(0, b - 3) },
+                            { label: "Addictif / Gâchis de temps ressenti", next: 'sommeil_1', scoreCalc: (b) => Math.max(0, b - 5) }
+                        ]
+                    },
+
+                    // --- SOMMEIL & FORME BRANCH ---
+                    sommeil_1: {
+                        catId: 'sommeil',
+                        question: "Combien d'heures as-tu dormi la nuit dernière ?",
+                        answers: [
+                            { label: "Plus de 8 heures (Nuit réparatrice)", next: 'sommeil_2_quality', addScore: 19 },
+                            { label: "Entre 7h et 8h (Bonne moyenne)", next: 'sommeil_2_quality', addScore: 16 },
+                            { label: "Entre 5h30 et 6h30 (Un peu juste)", next: 'sommeil_2_quality', addScore: 11 },
+                            { label: "Moins de 5h30 (Gros déficit)", next: 'sommeil_2_quality', addScore: 6 }
+                        ]
+                    },
+                    sommeil_2_quality: {
+                        catId: 'sommeil',
+                        question: "Quelle a été la qualité de ton sommeil ?",
+                        answers: [
+                            { label: "Profond et ininterrompu", next: 'sommeil_3_energy', scoreCalc: (b) => Math.min(20, b + 1) },
+                            { label: "Normal avec quelques réveils légers", next: 'sommeil_3_energy', scoreCalc: (b) => b },
+                            { label: "Agité / Difficultés à m'endormir", next: 'sommeil_3_energy', scoreCalc: (b) => Math.max(0, b - 3) },
+                            { label: "Cauchemars / Insomnie pénible", next: 'sommeil_3_energy', scoreCalc: (b) => Math.max(0, b - 5) }
+                        ]
+                    },
+                    sommeil_3_energy: {
+                        catId: 'sommeil',
+                        question: "À quel niveau d'énergie physique te sens-tu en ce moment ?",
+                        answers: [
+                            { label: "Excellente vitalité, zéro fatigue !", next: 'sommeil_4_screen_bed', scoreCalc: (b) => Math.min(20, b + 1) },
+                            { label: "Niveau d'énergie correct pour la journée", next: 'sommeil_4_screen_bed', scoreCalc: (b) => b },
+                            { label: "Coup de barre lourd dans l'après-midi", next: 'sommeil_4_screen_bed', scoreCalc: (b) => Math.max(0, b - 2) },
+                            { label: "Épuisement général / Somnolence", next: 'sommeil_4_screen_bed', scoreCalc: (b) => Math.max(0, b - 4) }
+                        ]
+                    },
+                    sommeil_4_screen_bed: {
+                        catId: 'sommeil',
+                        question: "As-tu utilisé des écrans dans ton lit avant d'aller t'endormir ?",
+                        answers: [
+                            { label: "Non, coupure complète au moins 30 min avant", next: 'end_quiz', scoreCalc: (b) => Math.min(20, b + 1) },
+                            { label: "Un petit peu puis rapidement posé", next: 'end_quiz', scoreCalc: (b) => b },
+                            { label: "Oui, longtemps dans le noir", next: 'end_quiz', scoreCalc: (b) => Math.max(0, b - 2) },
+                            { label: "Endormi avec le téléphone en main", next: 'end_quiz', scoreCalc: (b) => Math.max(0, b - 3) }
+                        ]
+                    }
+                }
+            },
+            weekend: {
+                start: 'etudes_wk_1',
+                nodes: {
+                    etudes_wk_1: {
+                        catId: 'etudes',
+                        question: "As-tu travaillé tes cours ce week-end ?",
+                        answers: [
+                            { label: "Grosse révision approfondie (2h+)", next: 'etudes_wk_2', addScore: 19 },
+                            { label: "Devoirs obligatoires faits (1h-2h)", next: 'etudes_wk_2', addScore: 15 },
+                            { label: "Relecture rapide (moins d'1h)", next: 'etudes_wk_2', addScore: 11 },
+                            { label: "Repos total (0 devoir)", next: 'social_wk_1', score: 6 }
+                        ]
+                    },
+                    etudes_wk_2: {
+                        catId: 'etudes',
+                        question: "Te sens-tu prêt pour les contrôles de la semaine prochaine ?",
+                        answers: [
+                            { label: "Serein et confiant", next: 'social_wk_1', scoreCalc: (b) => Math.min(20, b + 1) },
+                            { label: "Ça devrait aller", next: 'social_wk_1', scoreCalc: (b) => b },
+                            { label: "Encore pas mal de retards", next: 'social_wk_1', scoreCalc: (b) => Math.max(0, b - 2) },
+                            { label: "Stress important / Pas prêt", next: 'social_wk_1', scoreCalc: (b) => Math.max(0, b - 4) }
+                        ]
+                    },
+                    social_wk_1: {
+                        catId: 'social',
+                        question: "Comment s'est passée ta vie sociale ce week-end ?",
+                        answers: [
+                            { label: "Grand événement / Soirée géniale !", next: 'social_wk_2', addScore: 19 },
+                            { label: "Bons moments réguliers entre amis", next: 'social_wk_2', addScore: 16 },
+                            { label: "Repas et temps calme en famille", next: 'social_wk_2', addScore: 13 },
+                            { label: "Week-end plutôt solitaire", next: 'social_wk_2', addScore: 8 }
+                        ]
+                    },
+                    social_wk_2: {
+                        catId: 'social',
+                        question: "As-tu pu déconnecter mentalement du stress du lycée ?",
+                        answers: [
+                            { label: "Oui, déconnexion totale et bénéfique", next: 'activites_wk_1', scoreCalc: (b) => Math.min(20, b + 1) },
+                            { label: "Plutôt bien", next: 'activites_wk_1', scoreCalc: (b) => b },
+                            { label: "Moyen, la pression restait là", next: 'activites_wk_1', scoreCalc: (b) => Math.max(0, b - 2) },
+                            { label: "Pas du tout déconnecté", next: 'activites_wk_1', scoreCalc: (b) => Math.max(0, b - 3) }
+                        ]
+                    },
+                    activites_wk_1: {
+                        catId: 'activites',
+                        question: "As-tu pratiqué du sport ou une passion ce week-end ?",
+                        answers: [
+                            { label: "Match / Compétition / Grand sport", next: 'activites_wk_2', addScore: 19 },
+                            { label: "Séance de sport ou grande balade", next: 'activites_wk_2', addScore: 15 },
+                            { label: "Loisir créatif / Musique / Jeu vidéo", next: 'activites_wk_2', addScore: 12 },
+                            { label: "Canapé, séries et téléphone", next: 'activites_wk_2', addScore: 7 }
+                        ]
+                    },
+                    activites_wk_2: {
+                        catId: 'activites',
+                        question: "As-tu passé trop de temps passif sur les écrans ?",
+                        answers: [
+                            { label: "Non, temps maîtrisé", next: 'sommeil_wk_1', scoreCalc: (b) => Math.min(20, b + 1) },
+                            { label: "Un peu plus que d'habitude", next: 'sommeil_wk_1', scoreCalc: (b) => b },
+                            { label: "Beaucoup trop d'écrans", next: 'sommeil_wk_1', scoreCalc: (b) => Math.max(0, b - 3) },
+                            { label: "Nuit blanche sur les écrans", next: 'sommeil_wk_1', scoreCalc: (b) => Math.max(0, b - 5) }
+                        ]
+                    },
+                    sommeil_wk_1: {
+                        catId: 'sommeil',
+                        question: "Te sens-tu reposé et prêt pour attaquer la semaine ?",
+                        answers: [
+                            { label: "Forme olympique, batteries à 100%", next: 'end_quiz', score: 19 },
+                            { label: "Forme correcte et suffisante", next: 'end_quiz', score: 15 },
+                            { label: "Sommeil décalé mais ça va", next: 'end_quiz', score: 11 },
+                            { label: "Grosse fatigue / Rythme cassé", next: 'end_quiz', score: 6 }
+                        ]
+                    }
+                }
+            },
+            vacances: {
+                start: 'etudes_vac_1',
+                nodes: {
+                    etudes_vac_1: {
+                        catId: 'etudes',
+                        question: "As-tu révisé tes cours pendant tes vacances aujourd'hui ?",
+                        answers: [
+                            { label: "Grosse session de révisions (1h30+)", next: 'social_vac_1', score: 18 },
+                            { label: "Devoirs de vacances faits (45 min)", next: 'social_vac_1', score: 14 },
+                            { label: "Petite lecture / Fiches (20 min)", next: 'social_vac_1', score: 11 },
+                            { label: "0 travail (100% déconnexion)", next: 'social_vac_1', score: 8 }
+                        ]
+                    },
+                    social_vac_1: {
+                        catId: 'social',
+                        question: "Comment profites-tu de tes vacances socialement ?",
+                        answers: [
+                            { label: "Voyage / Sortie mémorable avec des proches", next: 'activites_vac_1', score: 19 },
+                            { label: "Retrouvailles sympas et régulières", next: 'activites_vac_1', score: 16 },
+                            { label: "Temps calme à la maison avec la famille", next: 'activites_vac_1', score: 13 },
+                            { label: "Journée isolée / Ennui", next: 'activites_vac_1', score: 7 }
+                        ]
+                    },
+                    activites_vac_1: {
+                        catId: 'activites',
+                        question: "As-tu bougé ou fait des activités stimulantes aujourd'hui ?",
+                        answers: [
+                            { label: "Grand sport / Excursion / Découverte", next: 'sommeil_vac_1', score: 19 },
+                            { label: "Séance de sport / Promenade", next: 'sommeil_vac_1', score: 15 },
+                            { label: "Loisir passion (musique, dessin, etc.)", next: 'sommeil_vac_1', score: 13 },
+                            { label: "Journée 100% flemme & réseaux", next: 'sommeil_vac_1', score: 6 }
+                        ]
+                    },
+                    sommeil_vac_1: {
+                        catId: 'sommeil',
+                        question: "Ton rythme de sommeil reste-t-il équilibré ?",
+                        answers: [
+                            { label: "Parfait, sommeil naturel et frais", next: 'end_quiz', score: 19 },
+                            { label: "Légèrement décalé mais réparateur", next: 'end_quiz', score: 15 },
+                            { label: "Très décalé (coucher très tard)", next: 'end_quiz', score: 10 },
+                            { label: "Rythme détruit / Nuit blanche", next: 'end_quiz', score: 5 }
+                        ]
+                    }
+                }
+            }
+        };
+
+        // Akinator Quiz State
+        let quizHistoryStack = [];
+        let currentNodeKey = 'start';
+        let categoryCalculatedScores = {
+            etudes: 12,
+            social: 12,
+            activites: 12,
+            sommeil: 12
+        };
+        let tempScoreHolders = {};
+
         let historyData = JSON.parse(localStorage.getItem('effort_history')) || [];
-        let goalsData = JSON.parse(localStorage.getItem('effort_goals')) || { social: 14, etudes: 14, activites: 12, sommeil: 14 };
+        let goalsData = JSON.parse(localStorage.getItem('effort_goals')) || {
+            etudes: 15,
+            social: 14,
+            activites: 13,
+            sommeil: 15
+        };
+        let currentUserId = localStorage.getItem('effort_user_id') || null;
         let currentChart = null;
 
+        function initDate() {
+            const today = new Date();
+            const dateLabel = document.getElementById('current-date-label');
+            if (dateLabel) {
+                dateLabel.innerText = today.toLocaleDateString('fr-FR', {
+                    weekday: 'long',
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric'
+                });
+            }
+
+            const dayOfWeek = today.getDay();
+            const modeSelect = document.getElementById('day-mode-select');
+            if (modeSelect) {
+                if (dayOfWeek === 0 || dayOfWeek === 6) {
+                    modeSelect.value = 'weekend';
+                }
+            }
+        }
+
+        // Render current Akinator Question
+        function renderAkinatorQuestion() {
+            const modeEl = document.getElementById('day-mode-select');
+            const mode = modeEl ? modeEl.value : 'cours';
+            const tree = akinatorDecisionTree[mode] || akinatorDecisionTree.cours;
+
+            if (currentNodeKey === 'start') {
+                currentNodeKey = tree.start;
+            }
+
+            const answersContainer = document.getElementById('quiz-answers-container');
+            const questionTitle = document.getElementById('quiz-question-title');
+            const questionSubtitle = document.getElementById('quiz-question-subtitle');
+            const catBadgeName = document.getElementById('quiz-cat-name');
+            const catBadgeIcon = document.getElementById('quiz-cat-icon');
+            const counterEl = document.getElementById('quiz-step-counter');
+            const btnPrev = document.getElementById('btn-prev-question');
+
+            if (!answersContainer || !questionTitle) return;
+
+            // Handle Quiz Completion
+            if (currentNodeKey === 'end_quiz') {
+                questionTitle.innerText = "🎉 Questionnaire Terminé !";
+                questionSubtitle.innerText = "Voici les notes calculées automatiquement selon tes choix :";
+                answersContainer.innerHTML = `
+                    <div class="bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800 p-6 rounded-2xl text-center space-y-3">
+                        <i class="fa-solid fa-circle-check text-4xl text-emerald-600"></i>
+                        <h4 class="font-bold text-lg text-emerald-900 dark:text-emerald-100">Bilan calculé avec succès !</h4>
+                        <p class="text-xs text-emerald-700 dark:text-emerald-300">Tu peux ajouter un petit mot ci-dessous et cliquer sur "Enregistrer la journée".</p>
+                    </div>
+                `;
+                if (counterEl) counterEl.innerText = "Terminé !";
+                if (btnPrev) btnPrev.classList.remove('hidden');
+                updateCalculatedSummaryUI();
+                updateGlobalScore();
+                return;
+            }
+
+            const node = tree.nodes[currentNodeKey];
+            if (!node) return;
+
+            const cat = categories.find(c => c.id === node.catId) || { name: 'Général', icon: 'fa-solid fa-star' };
+            if (catBadgeName) catBadgeName.innerText = cat.name;
+            if (catBadgeIcon) catBadgeIcon.className = cat.icon;
+            if (counterEl) counterEl.innerText = `Étape ${quizHistoryStack.length + 1}`;
+            if (btnPrev) {
+                if (quizHistoryStack.length === 0) btnPrev.classList.add('hidden');
+                else btnPrev.classList.remove('hidden');
+            }
+
+            questionTitle.innerText = node.question;
+            answersContainer.innerHTML = '';
+
+            node.answers.forEach((ans, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left px-5 py-4 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 hover:border-emerald-500 text-slate-800 dark:text-slate-100 text-sm font-semibold transition flex items-center justify-between group shadow-sm";
+                btn.innerHTML = `
+                    <span>${ans.label}</span>
+                    <i class="fa-solid fa-chevron-right text-slate-400 group-hover:text-emerald-600 transition"></i>
+                `;
+                btn.onclick = () => selectAkinatorAnswer(ans, node);
+                answersContainer.appendChild(btn);
+            });
+
+            updateCalculatedSummaryUI();
+            updateGlobalScore();
+        }
+
+        function selectAkinatorAnswer(answer, node) {
+            quizHistoryStack.push({
+                nodeKey: currentNodeKey,
+                scoresState: { ...categoryCalculatedScores },
+                tempState: { ...tempScoreHolders }
+            });
+
+            // Calculate category score logic
+            if (answer.score !== undefined) {
+                categoryCalculatedScores[node.catId] = answer.score;
+            } else if (answer.addScore !== undefined) {
+                tempScoreHolders[node.catId] = answer.addScore;
+            } else if (answer.scoreCalc !== undefined && tempScoreHolders[node.catId] !== undefined) {
+                categoryCalculatedScores[node.catId] = answer.scoreCalc(tempScoreHolders[node.catId]);
+            }
+
+            currentNodeKey = answer.next;
+            renderAkinatorQuestion();
+        }
+
+        function prevAkinatorQuestion() {
+            if (quizHistoryStack.length === 0) return;
+            const previous = quizHistoryStack.pop();
+            currentNodeKey = previous.nodeKey;
+            categoryCalculatedScores = previous.scoresState;
+            tempScoreHolders = previous.tempState;
+            renderAkinatorQuestion();
+        }
+
+        function resetAkinatorQuiz(newMode = null) {
+            quizHistoryStack = [];
+            currentNodeKey = 'start';
+            tempScoreHolders = {};
+            categoryCalculatedScores = { etudes: 12, social: 12, activites: 12, sommeil: 12 };
+            renderAkinatorQuestion();
+        }
+
+        function updateCalculatedSummaryUI() {
+            const listEl = document.getElementById('calculated-cat-list');
+            if (!listEl) return;
+            listEl.innerHTML = '';
+
+            categories.forEach(cat => {
+                const score = categoryCalculatedScores[cat.id] || 12;
+                const div = document.createElement('div');
+                div.className = "flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-700/50";
+                div.innerHTML = `
+                    <div class="flex items-center space-x-2">
+                        <i class="${cat.icon} text-emerald-600"></i>
+                        <span class="font-semibold text-slate-700 dark:text-slate-300">${cat.name}</span>
+                    </div>
+                    <span class="font-black text-emerald-600 text-sm">${score}/20</span>
+                `;
+                listEl.appendChild(div);
+            });
+        }
+
+        function calculateWeightedScore(scoresObj) {
+            let totalWeightedScore = 0;
+            let totalWeights = 0;
+
+            categories.forEach(cat => {
+                const score = scoresObj[cat.id] !== undefined ? scoresObj[cat.id] : 12;
+                totalWeightedScore += score * cat.weight;
+                totalWeights += cat.weight;
+            });
+
+            if (totalWeights === 0) return 0;
+            return (totalWeightedScore / totalWeights).toFixed(1);
+        }
+
+        function updateGlobalScore() {
+            const global = parseFloat(calculateWeightedScore(categoryCalculatedScores));
+            const globalScoreEl = document.getElementById('global-score');
+            if (globalScoreEl) globalScoreEl.innerText = global;
+
+            const statusEl = document.getElementById('global-status');
+            const quoteEl = document.getElementById('daily-quote');
+
+            if (!statusEl || !quoteEl) return;
+
+            if (global < 8) {
+                statusEl.innerText = "Journée difficile";
+                statusEl.className = "mt-2 text-xs font-semibold px-3 py-1 rounded-full bg-rose-500/30 text-rose-100";
+                quoteEl.innerText = `"Demain est un nouveau jour pour tout donner. Ne lâche rien !"`;
+            } else if (global < 12) {
+                statusEl.innerText = "Effort modéré";
+                statusEl.className = "mt-2 text-xs font-semibold px-3 py-1 rounded-full bg-amber-500/30 text-amber-100";
+                quoteEl.innerText = `"Tu assures l'essentiel, essaie d'appuyer un peu plus sur tes priorités demain."`;
+            } else if (global < 16) {
+                statusEl.innerText = "Bonne journée !";
+                statusEl.className = "mt-2 text-xs font-semibold px-3 py-1 rounded-full bg-teal-500/30 text-teal-100";
+                quoteEl.innerText = `"Belle régularité ! Ton équilibre vie sociale et études porte ses fruits."`;
+            } else {
+                statusEl.innerText = "Journée exceptionnelle 🚀";
+                statusEl.className = "mt-2 text-xs font-semibold px-3 py-1 rounded-full bg-white/30 text-white";
+                quoteEl.innerText = `"Performance au sommet ! Tu gères ta vie d'une main de maître."`;
+            }
+        }
+
+        function saveTodayData() {
+            const todayKey = new Date().toISOString().split('T')[0];
+            const global = parseFloat(calculateWeightedScore(categoryCalculatedScores));
+            const notesEl = document.getElementById('day-notes');
+            const notes = notesEl ? notesEl.value : '';
+            const modeEl = document.getElementById('day-mode-select');
+            const mode = modeEl ? modeEl.value : 'cours';
+
+            const existingIndex = historyData.findIndex(d => d.date === todayKey);
+            if (existingIndex >= 0) {
+                historyData[existingIndex].scores = { ...categoryCalculatedScores };
+                historyData[existingIndex].global = global;
+                historyData[existingIndex].notes = notes;
+                historyData[existingIndex].mode = mode;
+            } else {
+                historyData.push({
+                    date: todayKey,
+                    scores: { ...categoryCalculatedScores },
+                    global: global,
+                    notes: notes,
+                    mode: mode
+                });
+            }
+
+            historyData.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            localStorage.setItem('effort_history', JSON.stringify(historyData));
+            updateStatsSummary();
+            renderHistoryTable();
+            renderHeatmap();
+            if (currentChart) initHistoryChart();
+
+            showToast("Bilan calculé et enregistré !");
+        }
+
+        // Auto-register Service Worker for PWA Push Notifications on Mobile
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                const swCode = `
+                    self.addEventListener('install', (e) => self.skipWaiting());
+                    self.addEventListener('activate', (e) => self.clients.claim());
+                    self.addEventListener('message', (e) => {
+                        if (e.data && e.data.type === 'SHOW_NOTIF') {
+                            self.registration.showNotification(e.data.title, e.data.options);
+                        }
+                    });
+                `;
+                const blob = new Blob([swCode], { type: 'application/javascript' });
+                const swUrl = URL.createObjectURL(blob);
+                navigator.serviceWorker.register(swUrl).catch(err => console.log('SW setup skipped'));
+            });
+        }
+
+        async function testNotification() {
+            if (!("Notification" in window)) {
+                alert("Votre navigateur mobile ne prend pas en charge les notifications système.");
+                return;
+            }
+
+            const permission = await Notification.requestPermission();
+            if (permission === "granted") {
+                const notifTitle = "EffortTracker Lycée 🎯";
+                const notifOptions = {
+                    body: "C'est l'heure de répondre au questionnaire intelligent !",
+                    icon: "data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%2316a34a%22/><text x=%2250%%22 y=%2255%%22 font-size=%2250%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22 fill=%22%23ffffff%22 font-weight=%22bold%22 font-family=%22sans-serif%22>ET</text></svg>",
+                    vibrate: [200, 100, 200]
+                };
+
+                if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+                    navigator.serviceWorker.controller.postMessage({
+                        type: 'SHOW_NOTIF',
+                        title: notifTitle,
+                        options: notifOptions
+                    });
+                } else if ('serviceWorker' in navigator) {
+                    const reg = await navigator.serviceWorker.ready;
+                    reg.showNotification(notifTitle, notifOptions);
+                } else {
+                    new Notification(notifTitle, notifOptions);
+                }
+                showToast("Notification système envoyée sur ton écran !");
+            } else {
+                alert("Pour recevoir de vraies notifications, autorise les notifications dans les réglages Safari/Chrome de ton téléphone.");
+            }
+        }
+
+        // DOMContentLoaded event listener
         window.addEventListener('DOMContentLoaded', () => {
             initDate();
-            renderSliders();
+            renderAkinatorQuestion();
             updateGlobalScore();
             updateStatsSummary();
             initHistoryChart();
@@ -658,50 +1204,76 @@
             renderHeatmap();
             initNotificationsUI();
             startNotificationChecker();
+            checkAccountStatusUI();
 
             if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
                 document.documentElement.classList.add('dark');
             }
         });
 
-        function initDate() {
-            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            const todayStr = new Date().toLocaleDateString('fr-FR', options);
-            document.getElementById('current-date-label').innerText = todayStr.charAt(0).toUpperCase() + todayStr.slice(1);
-        }
+        // Account / Cloud Sync simulation logic
+        function checkAccountStatusUI() {
+            const loggedOutDiv = document.getElementById('account-logged-out');
+            const loggedInDiv = document.getElementById('account-logged-in');
+            const subtitle = document.getElementById('account-status-subtitle');
+            const uidDisplay = document.getElementById('user-uid-display');
 
-        function switchTab(tabId) {
-            ['dashboard', 'history', 'goals', 'categories', 'mobile-app', 'cloud-sync'].forEach(id => {
-                document.getElementById(`tab-${id}`).classList.add('hidden');
-                document.getElementById(`nav-${id}`).className = "px-3 py-2 text-xs sm:text-sm font-semibold rounded-xl transition-all text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 shrink-0";
-            });
-            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
-            document.getElementById(`nav-${tabId}`).className = "px-3 py-2 text-xs sm:text-sm font-semibold rounded-xl transition-all bg-emerald-50 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 shrink-0";
-            
-            if (tabId === 'history') {
-                renderHistoryTable();
-                renderHeatmap();
-                if (currentChart) currentChart.update();
-            } else if (tabId === 'goals') {
-                renderGoalsView();
-            } else if (tabId === 'categories') {
-                renderCategoriesGrid();
+            if (currentUserId && loggedOutDiv && loggedInDiv) {
+                loggedOutDiv.classList.add('hidden');
+                loggedInDiv.classList.remove('hidden');
+                if (subtitle) subtitle.innerText = "Connecté (Synchronisé)";
+                if (uidDisplay) uidDisplay.innerText = currentUserId;
+            } else if (loggedOutDiv && loggedInDiv) {
+                loggedOutDiv.classList.remove('hidden');
+                loggedInDiv.classList.add('hidden');
+                if (subtitle) subtitle.innerText = "Non connecté (Mode Local)";
             }
         }
 
-        function toggleDarkMode() {
-            if (document.documentElement.classList.contains('dark')) {
-                document.documentElement.classList.remove('dark');
-                localStorage.setItem('theme', 'light');
-            } else {
-                document.documentElement.classList.add('dark');
-                localStorage.setItem('theme', 'dark');
+        function loginAnonymouslyCloud() {
+            if (!currentUserId) {
+                currentUserId = 'user_' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+                localStorage.setItem('effort_user_id', currentUserId);
+            }
+            checkAccountStatusUI();
+            syncNowToCloud();
+            showToast("Compte créé et connecté avec succès !");
+        }
+
+        function logoutCloud() {
+            if (confirm("Voulez-vous vous déconnecter de ce compte sur cet appareil ?")) {
+                localStorage.removeItem('effort_user_id');
+                currentUserId = null;
+                checkAccountStatusUI();
+                showToast("Déconnecté avec succès.");
             }
         }
 
-        function changeDayMode(mode) {
-            renderSliders();
-            updateGlobalScore();
+        function copyUserId() {
+            if (!currentUserId) return;
+            const textarea = document.createElement('textarea');
+            textarea.value = currentUserId;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            showToast("ID Utilisateur copié dans le presse-papier !");
+        }
+
+        function syncNowToCloud() {
+            if (!currentUserId) {
+                alert("Veuillez d'abord créer un compte.");
+                return;
+            }
+            const cloudPayload = {
+                userId: currentUserId,
+                categories,
+                history: historyData,
+                goals: goalsData,
+                updatedAt: new Date().toISOString()
+            };
+            localStorage.setItem(`effort_cloud_backup_${currentUserId}`, JSON.stringify(cloudPayload));
+            showToast("Données synchronisées avec le cloud avec succès !");
         }
 
         // Notification Management System
@@ -709,18 +1281,21 @@
             const enabled = localStorage.getItem('effort_notif_enabled') === 'true';
             const savedTime = localStorage.getItem('effort_notif_time') || '20:00';
             
-            document.getElementById('notif-time-input').value = savedTime;
+            const timeInput = document.getElementById('notif-time-input');
+            if (timeInput) timeInput.value = savedTime;
 
             const btn = document.getElementById('notif-btn');
             const label = document.getElementById('notif-label');
-            if (enabled) {
-                label.innerText = `Statut : Actif (${savedTime})`;
-                btn.innerText = "Désactiver";
-                btn.className = "px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold rounded-xl transition shadow";
-            } else {
-                label.innerText = "Statut : Inactif";
-                btn.innerText = "Activer le rappel";
-                btn.className = "px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-xl transition shadow";
+            if (btn && label) {
+                if (enabled) {
+                    label.innerText = `Statut : Actif (${savedTime})`;
+                    btn.innerText = "Désactiver";
+                    btn.className = "px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold rounded-xl transition shadow";
+                } else {
+                    label.innerText = "Statut : Inactif";
+                    btn.innerText = "Activer";
+                    btn.className = "px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-xl transition shadow";
+                }
             }
         }
 
@@ -734,40 +1309,27 @@
             const enabled = localStorage.getItem('effort_notif_enabled') === 'true';
             if (!enabled) {
                 if (!("Notification" in window)) {
-                    alert("Ton navigateur ne supporte pas les notifications.");
+                    showToast("Navigateur incompatible avec les notifications.");
                     return;
                 }
-                const permission = await Notification.requestPermission();
-                if (permission === "granted") {
+                try {
+                    const permission = await Notification.requestPermission();
+                    if (permission === "granted") {
+                        localStorage.setItem('effort_notif_enabled', 'true');
+                        showToast("Rappel quotidien activé avec succès !");
+                    } else {
+                        showToast("Permission de notification refusée.");
+                        return;
+                    }
+                } catch(e) {
                     localStorage.setItem('effort_notif_enabled', 'true');
-                    showToast("Rappel quotidien activé avec succès !");
-                } else {
-                    alert("Permission de notification refusée dans le navigateur.");
-                    return;
+                    showToast("Rappel activé !");
                 }
             } else {
                 localStorage.setItem('effort_notif_enabled', 'false');
                 showToast("Rappel quotidien désactivé.");
             }
             initNotificationsUI();
-        }
-
-        function testNotification() {
-            if (!("Notification" in window)) {
-                alert("Ton navigateur ne supporte pas les notifications.");
-                return;
-            }
-            Notification.requestPermission().then(permission => {
-                if (permission === "granted") {
-                    new Notification("EffortTracker Lycée 🎯", {
-                        body: "C'est l'heure de faire ton bilan quotidien de la journée !",
-                        icon: "https://placehold.co/192x192/16a34a/ffffff?text=ET"
-                    });
-                    showToast("Notification de test envoyée !");
-                } else {
-                    alert("Veuillez autoriser les notifications dans votre navigateur.");
-                }
-            });
         }
 
         function startNotificationChecker() {
@@ -786,173 +1348,28 @@
 
                 if (hours === targetHour && minutes === targetMinute && lastNotifDate !== todayKey) {
                     if ("Notification" in window && Notification.permission === "granted") {
-                        new Notification(`Bilan du soir 🌙 - EffortTracker (${targetTime})`, {
-                            body: `Il est ${targetTime} ! Pense à noter ta journée (études, vie sociale, sommeil...) pour garder le cap.`,
-                            icon: "https://placehold.co/192x192/16a34a/ffffff?text=ET"
-                        });
-                        localStorage.setItem('effort_last_notif_date', todayKey);
+                        try {
+                            new Notification(`Bilan du soir 🌙 - EffortTracker (${targetTime})`, {
+                                body: `Il est ${targetTime} ! Réponds aux questions pour évaluer ta journée.`,
+                                icon: "data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%2316a34a%22/><text x=%2250%%22 y=%2255%%22 font-size=%2250%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22 fill=%22%23ffffff%22 font-weight=%22bold%22 font-family=%22sans-serif%22>ET</text></svg>"
+                            });
+                            localStorage.setItem('effort_last_notif_date', todayKey);
+                        } catch(e) {}
                     }
                 }
             }, 60000);
         }
 
-        function renderSliders() {
-            const container = document.getElementById('sliders-container');
-            container.innerHTML = '';
-
-            const todayKey = new Date().toISOString().split('T')[0];
-            const existingEntry = historyData.find(d => d.date === todayKey);
-            const mode = document.getElementById('day-mode-select').value;
-
-            categories.forEach(cat => {
-                const initialVal = existingEntry && existingEntry.scores[cat.id] !== undefined ? existingEntry.scores[cat.id] : 12;
-                const benchmarkText = getCategoryBenchmark(cat.id, initialVal, mode);
-
-                const card = document.createElement('div');
-                card.className = "bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-4";
-                card.innerHTML = `
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center space-x-3">
-                            <div class="p-2.5 rounded-2xl bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400">
-                                <i class="${cat.icon} text-lg"></i>
-                            </div>
-                            <div>
-                                <h4 class="font-bold text-slate-800 dark:text-slate-100">${cat.name}</h4>
-                                <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">Poids : ${cat.weight}x</span>
-                            </div>
-                        </div>
-                        <div class="flex items-baseline space-x-1">
-                            <span id="score-val-${cat.id}" class="text-2xl font-black text-emerald-600 dark:text-emerald-400">${initialVal}</span>
-                            <span class="text-xs font-medium text-slate-400">/20</span>
-                        </div>
-                    </div>
-
-                    <div class="space-y-2">
-                        <input type="range" id="slider-${cat.id}" min="0" max="20" step="1" value="${initialVal}" 
-                            oninput="onSliderChange('${cat.id}', this.value)" 
-                            class="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-emerald-600">
-                    </div>
-
-                    <div class="flex items-start space-x-2 p-3 rounded-2xl bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800 text-xs">
-                        <i class="fa-solid fa-circle-info text-emerald-600 mt-0.5 shrink-0"></i>
-                        <span id="benchmark-${cat.id}" class="text-slate-600 dark:text-slate-300 font-medium">${benchmarkText}</span>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-
-            if (existingEntry && existingEntry.notes) {
-                document.getElementById('day-notes').value = existingEntry.notes;
-            }
-        }
-
-        function onSliderChange(catId, value) {
-            const valNum = parseInt(value, 10);
-            const mode = document.getElementById('day-mode-select').value;
-            document.getElementById(`score-val-${catId}`).innerText = valNum;
-            document.getElementById(`benchmark-${catId}`).innerText = getCategoryBenchmark(catId, valNum, mode);
-            updateGlobalScore();
-        }
-
-        function calculateWeightedScore(scoresObj) {
-            let totalWeightedScore = 0;
-            let totalWeights = 0;
-
-            categories.forEach(cat => {
-                const score = scoresObj[cat.id] !== undefined ? scoresObj[cat.id] : 12;
-                totalWeightedScore += score * cat.weight;
-                totalWeights += cat.weight;
-            });
-
-            if (totalWeights === 0) return 0;
-            return (totalWeightedScore / totalWeights).toFixed(1);
-        }
-
-        function updateGlobalScore() {
-            let currentScores = {};
-            categories.forEach(cat => {
-                const slider = document.getElementById(`slider-${cat.id}`);
-                currentScores[cat.id] = slider ? parseInt(slider.value, 10) : 12;
-            });
-
-            const global = parseFloat(calculateWeightedScore(currentScores));
-            document.getElementById('global-score').innerText = global;
-
-            const statusEl = document.getElementById('global-status');
-            const quoteEl = document.getElementById('daily-quote');
-
-            if (global < 8) {
-                statusEl.innerText = "Journée difficile";
-                statusEl.className = "mt-2 text-xs font-semibold px-3 py-1 rounded-full bg-rose-500/30 text-rose-100";
-                quoteEl.innerText = `"Demain est un nouveau jour pour tout donner. Ne lâche rien !"`;
-            } else if (global < 12) {
-                statusEl.innerText = "Effort modéré";
-                statusEl.className = "mt-2 text-xs font-semibold px-3 py-1 rounded-full bg-amber-500/30 text-amber-100";
-                quoteEl.innerText = `"Tu assures l'essentiel, essaie d'appuyer un peu plus sur tes priorités demain."`;
-            } else if (global < 16) {
-                statusEl.innerText = "Bonne journée !";
-                statusEl.className = "mt-2 text-xs font-semibold px-3 py-1 rounded-full bg-teal-500/30 text-teal-100";
-                quoteEl.innerText = `"Belle régularité ! Ton équilibre vie sociale et études porte ses fruits."`;
-            } else {
-                statusEl.innerText = "Journée exceptionnelle 🚀";
-                statusEl.className = "mt-2 text-xs font-semibold px-3 py-1 rounded-full bg-white/30 text-white";
-                quoteEl.innerText = `"Performance au sommet ! Tu gères ta vie de lycéen d'une main de maître."`;
-            }
-        }
-
-        function saveTodayData() {
-            const todayKey = new Date().toISOString().split('T')[0];
-            let currentScores = {};
-            categories.forEach(cat => {
-                const slider = document.getElementById(`slider-${cat.id}`);
-                currentScores[cat.id] = slider ? parseInt(slider.value, 10) : 12;
-            });
-
-            const global = parseFloat(calculateWeightedScore(currentScores));
-            const notes = document.getElementById('day-notes').value;
-            const mode = document.getElementById('day-mode-select').value;
-
-            const existingIndex = historyData.findIndex(d => d.date === todayKey);
-            if (existingIndex >= 0) {
-                historyData[existingIndex].scores = currentScores;
-                historyData[existingIndex].global = global;
-                historyData[existingIndex].notes = notes;
-                historyData[existingIndex].mode = mode;
-            } else {
-                historyData.push({
-                    date: todayKey,
-                    scores: currentScores,
-                    global: global,
-                    notes: notes,
-                    mode: mode
-                });
-            }
-
-            historyData.sort((a, b) => new Date(b.date) - new Date(a.date));
-
-            localStorage.setItem('effort_history', JSON.stringify(historyData));
-            updateStatsSummary();
-            renderHistoryTable();
-            renderHeatmap();
-            if (currentChart) initHistoryChart();
-
-            showToast("Bilan de la journée enregistré avec succès !");
-        }
-
         function copyDiscordSummary() {
             const todayKey = new Date().toISOString().split('T')[0];
-            let currentScores = {};
-            categories.forEach(cat => {
-                const slider = document.getElementById(`slider-${cat.id}`);
-                currentScores[cat.id] = slider ? parseInt(slider.value, 10) : 12;
-            });
-            const global = calculateWeightedScore(currentScores);
-            const notes = document.getElementById('day-notes').value || "Aucune note particulière.";
+            const global = calculateWeightedScore(categoryCalculatedScores);
+            const notesEl = document.getElementById('day-notes');
+            const notes = notesEl && notesEl.value ? notesEl.value : "Aucune note particulière.";
 
-            let text = `📊 **Bilan EffortTracker - ${todayKey}**\n`;
-            text += `⭐ **Note Globale Pondérée : ${global}/20**\n`;
+            let text = `📊 **Bilan Intelligent EffortTracker - ${todayKey}**\n`;
+            text += `⭐ **Note Globale Calculée : ${global}/20**\n`;
             categories.forEach(cat => {
-                text += `• ${cat.name} (${cat.weight}x) : ${currentScores[cat.id]}/20\n`;
+                text += `• ${cat.name} (${cat.weight}x) : ${categoryCalculatedScores[cat.id]}/20\n`;
             });
             text += `📝 *Notes :* ${notes}`;
 
@@ -968,7 +1385,9 @@
 
         function showToast(msg) {
             const toast = document.getElementById('toast');
-            document.getElementById('toast-message').innerText = msg;
+            const toastMsg = document.getElementById('toast-message');
+            if (!toast || !toastMsg) return;
+            toastMsg.innerText = msg;
             toast.classList.remove('translate-x-full');
             setTimeout(() => {
                 toast.classList.add('translate-x-full');
@@ -976,24 +1395,29 @@
         }
 
         function updateStatsSummary() {
-            document.getElementById('stats-total-days').innerText = historyData.length;
+            const totalDaysEl = document.getElementById('stats-total-days');
+            const globalAvgEl = document.getElementById('stats-global-avg');
+            const movingAvgEl = document.getElementById('moving-avg');
+
+            if (totalDaysEl) totalDaysEl.innerText = historyData.length;
             if (historyData.length === 0) {
-                document.getElementById('stats-global-avg').innerText = "-- / 20";
-                document.getElementById('moving-avg').innerText = "--";
+                if (globalAvgEl) globalAvgEl.innerText = "-- / 20";
+                if (movingAvgEl) movingAvgEl.innerText = "--";
                 return;
             }
             const sum = historyData.reduce((acc, curr) => acc + curr.global, 0);
             const avg = (sum / historyData.length).toFixed(1);
-            document.getElementById('stats-global-avg').innerText = `${avg} / 20`;
+            if (globalAvgEl) globalAvgEl.innerText = `${avg} / 20`;
 
             const last7 = [...historyData].sort((a, b) => new Date(a.date) - new Date(b.date)).slice(-7);
             const sum7 = last7.reduce((acc, curr) => acc + curr.global, 0);
             const movingAvg = last7.length > 0 ? (sum7 / last7.length).toFixed(1) : "--";
-            document.getElementById('moving-avg').innerText = movingAvg;
+            if (movingAvgEl) movingAvgEl.innerText = movingAvg;
         }
 
         function renderHeatmap() {
             const container = document.getElementById('heatmap-container');
+            if (!container) return;
             container.innerHTML = '';
 
             for (let i = 29; i >= 0; i--) {
@@ -1028,6 +1452,7 @@
 
         function renderHistoryTable() {
             const tbody = document.getElementById('history-table-body');
+            if (!tbody) return;
             tbody.innerHTML = '';
 
             if (historyData.length === 0) {
@@ -1068,7 +1493,9 @@
         }
 
         function initHistoryChart() {
-            const ctx = document.getElementById('historyChart').getContext('2d');
+            const canvasEl = document.getElementById('historyChart');
+            if (!canvasEl) return;
+            const ctx = canvasEl.getContext('2d');
             const sortedAsc = [...historyData].sort((a, b) => new Date(a.date) - new Date(b.date)).slice(-14);
 
             const labels = sortedAsc.map(d => new Date(d.date).toLocaleDateString('fr-FR', { month: 'short', day: 'numeric' }));
@@ -1116,6 +1543,7 @@
 
         function renderGoalsView() {
             const container = document.getElementById('goals-container');
+            if (!container) return;
             container.innerHTML = '';
 
             categories.forEach(cat => {
@@ -1156,6 +1584,7 @@
 
         function renderCategoriesGrid() {
             const grid = document.getElementById('categories-grid');
+            if (!grid) return;
             grid.innerHTML = '';
 
             categories.forEach(cat => {
@@ -1186,6 +1615,7 @@
 
         function openCategoryModal(catId = null) {
             const modal = document.getElementById('category-modal');
+            if (!modal) return;
             modal.classList.remove('hidden');
             if (catId) {
                 const cat = categories.find(c => c.id === catId);
@@ -1206,7 +1636,8 @@
         }
 
         function closeCategoryModal() {
-            document.getElementById('category-modal').classList.add('hidden');
+            const modal = document.getElementById('category-modal');
+            if (modal) modal.classList.add('hidden');
         }
 
         function handleCategorySubmit(e) {
@@ -1237,7 +1668,7 @@
             localStorage.setItem('effort_goals', JSON.stringify(goalsData));
             closeCategoryModal();
             renderCategoriesGrid();
-            renderSliders();
+            resetAkinatorQuiz();
             renderGoalsView();
             updateGlobalScore();
             showToast("Catégories mises à jour !");
@@ -1252,10 +1683,43 @@
                 categories = categories.filter(c => c.id !== catId);
                 localStorage.setItem('effort_categories', JSON.stringify(categories));
                 renderCategoriesGrid();
-                renderSliders();
+                resetAkinatorQuiz();
                 renderGoalsView();
                 updateGlobalScore();
                 showToast("Catégorie supprimée");
+            }
+        }
+
+        function switchTab(tabId) {
+            ['dashboard', 'history', 'goals', 'categories', 'mobile-app', 'cloud-sync'].forEach(id => {
+                const tabEl = document.getElementById(`tab-${id}`);
+                const navEl = document.getElementById(`nav-${id}`);
+                if (tabEl) tabEl.classList.add('hidden');
+                if (navEl) navEl.className = "px-3 py-1.5 text-xs font-semibold rounded-xl transition-all text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 shrink-0 flex items-center space-x-1";
+            });
+            const activeTab = document.getElementById(`tab-${tabId}`);
+            const activeNav = document.getElementById(`nav-${tabId}`);
+            if (activeTab) activeTab.classList.remove('hidden');
+            if (activeNav) activeNav.className = "px-3 py-1.5 text-xs font-semibold rounded-xl transition-all bg-emerald-50 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 shrink-0 flex items-center space-x-1";
+            
+            if (tabId === 'history') {
+                renderHistoryTable();
+                renderHeatmap();
+                if (currentChart) currentChart.update();
+            } else if (tabId === 'goals') {
+                renderGoalsView();
+            } else if (tabId === 'categories') {
+                renderCategoriesGrid();
+            }
+        }
+
+        function toggleDarkMode() {
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
             }
         }
 
@@ -1295,7 +1759,7 @@
                         localStorage.setItem('effort_categories', JSON.stringify(categories));
                         localStorage.setItem('effort_history', JSON.stringify(historyData));
                         localStorage.setItem('effort_goals', JSON.stringify(goalsData));
-                        renderSliders();
+                        resetAkinatorQuiz();
                         renderHistoryTable();
                         renderCategoriesGrid();
                         renderGoalsView();
